@@ -1,1 +1,1 @@
-# apisix-workshop
+# Hands-on lab Apache APISIX
