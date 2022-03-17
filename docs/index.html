@@ -458,10 +458,17 @@
         </ul>
       </li>
       <li><a href="#_create_an_upstream">Create an Upstream</a></li>
-      <li><a href="#_bind_the_route_to_the_upstream">Bind the Route to the Upstream</a></li>
-      <li><a href="#_validation">Validation</a></li>
-      <li><a href="#_apisix_dashboard">APISIX Dashboard</a></li>
-      <li><a href="#_add_a_new_consumer">Add a new Consumer</a></li>
+      <li><a href="#_bind_the_route_to_the_upstream">Bind the Route to the Upstream</a>
+        <ul class="sectlevel2">
+          <li><a href="#_validation">Validation</a></li>
+        </ul>
+      </li>
+      <li><a href="#_apisix_dashboard">APISIX Dashboard</a>
+        <ul class="sectlevel2">
+          <li><a href="#_add_a_new_consumer">Add a new Consumer</a></li>
+          <li><a href="#_enable_key_auth_plugin">Enable key-auth plugin</a></li>
+        </ul>
+      </li>
     </ul>
   </div>
 </div>
@@ -690,23 +697,21 @@
 }'</code></pre>
         </div>
       </div>
-    </div>
-  </div>
-  <div class="sect1">
-    <h2 id="_validation">Validation</h2>
-    <div class="sectionbody">
-      <div class="paragraph">
-        <p>We have created the route and the Upstream service and bound them. Now
-          let’s access Apache APISIX to test this route.</p>
-      </div>
-      <div class="listingblock">
-        <div class="content">
-          <pre class="CodeRay highlight"><code data-lang="shell script">  curl -i -X GET &quot;http://127.0.0.1:9080/get?foo1=bar1&amp;foo2=bar2&quot; -H &quot;Host: httpbin.org&quot;</code></pre>
+      <div class="sect2">
+        <h3 id="_validation">Validation</h3>
+        <div class="paragraph">
+          <p>We have created the route and the Upstream service and bound them. Now
+            let’s access Apache APISIX to test this route.</p>
         </div>
-      </div>
-      <div class="paragraph">
-        <p>It returns data from our Upstream service (actually httpbin.org) and the
-          result is as expected.</p>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="CodeRay highlight"><code data-lang="shell script">  curl -i -X GET &quot;http://127.0.0.1:9080/get?foo1=bar1&amp;foo2=bar2&quot; -H &quot;Host: httpbin.org&quot;</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>It returns data from our Upstream service (actually httpbin.org) and the
+            result is as expected.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -734,136 +739,177 @@
           </tr>
         </table>
       </div>
-    </div>
-  </div>
-  <div class="sect1">
-    <h2 id="_add_a_new_consumer">Add a new Consumer</h2>
-    <div class="sectionbody">
-      <div class="paragraph">
-        <p>In the above steps, we created a new route, upstream and mapped the route to the upstream.</p>
-      </div>
-      <div class="exampleblock">
-        <div class="content">
-          <div class="paragraph">
-            <p>The same configuration we did via command-line interface can be achieved with the Dashboard.</p>
+      <div class="sect2">
+        <h3 id="_add_a_new_consumer">Add a new Consumer</h3>
+        <div class="paragraph">
+          <p>In the above steps, we created a new route, upstream and mapped the route to the upstream.</p>
+        </div>
+        <div class="exampleblock">
+          <div class="content">
+            <div class="paragraph">
+              <p>The same configuration we did via command-line interface can be achieved with the Dashboard.</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="ulist">
-        <div class="title">Here are some of the things you can do with APISIX Dashboard:</div>
-        <ul>
-          <li>
-            <p>Create new Routes, Upstreams and Consumers.</p>
-          </li>
-          <li>
-            <p>Activate or deactivate plugins with a couple of clicks.</p>
-          </li>
-        </ul>
-      </div>
-      <div class="admonitionblock warning">
-        <table>
-          <tr>
-            <td class="icon">
-              <i class="fa icon-warning" title="Warning"></i>
-            </td>
-            <td class="content">
-              The route we created is public. Thus, anyone can access this Upstream service as long as they know the address that Apache APISIX exposes to the outside world. This is unsafe, it creates certain security risks. In a practical application scenario, we need to add authentication to the route.
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="paragraph">
-        <p>Apache APISIX dashboard is running on the address <a href="http://localhost:9000/" class="bare">http://localhost:9000/</a>
-          if you click and try to open the Apache APISIX dashboard you can see the dashboard is running</p>
-      </div>
-      <div class="exampleblock">
-        <div class="content">
-          <div class="paragraph">
-            <p>You can log into the dashboard by using <strong>login</strong> as <em>admin</em> and <strong>password</strong> as an <em>admin</em>.</p>
+        <div class="ulist">
+          <div class="title">Here are some of the things you can do with APISIX Dashboard:</div>
+          <ul>
+            <li>
+              <p>Create new Routes, Upstreams and Consumers.</p>
+            </li>
+            <li>
+              <p>Activate or deactivate plugins with a couple of clicks.</p>
+            </li>
+          </ul>
+        </div>
+        <div class="admonitionblock warning">
+          <table>
+            <tr>
+              <td class="icon">
+                <i class="fa icon-warning" title="Warning"></i>
+              </td>
+              <td class="content">
+                The route we created is public. Thus, anyone can access this Upstream service as long as they know the address that Apache APISIX exposes to the outside world. This is unsafe, it creates certain security risks. In a practical application scenario, we need to add authentication to the route.
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="paragraph">
+          <p>Apache APISIX dashboard is running on the address <a href="http://localhost:9000/" class="bare">http://localhost:9000/</a>
+            if you click and try to open the Apache APISIX dashboard you can see the dashboard is running</p>
+        </div>
+        <div class="exampleblock">
+          <div class="content">
+            <div class="paragraph">
+              <p>You can log into the dashboard by using <strong>login</strong> as <em>admin</em> and <strong>password</strong> as an <em>admin</em>.</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="imageblock">
-        <div class="content">
-          <img src="login-dashboard-screenshot.png" alt="login dashboard screenshot">
-        </div>
-      </div>
-      <div class="paragraph">
-        <p>After you logged in, go to Route page in the navigation bar on the left side.</p>
-      </div>
-      <div class="paragraph">
-        <p>As you can see in the below image, there is a route in the Route list that we created previously with curl commands.</p>
-      </div>
-      <div class="imageblock">
-        <div class="content">
-          <img src="route-list-screenshot.png" alt="route list screenshot">
-        </div>
-      </div>
-      <div class="paragraph">
-        <p>Next, open Upstream page by navigating to Upstream option on the same bar.</p>
-      </div>
-      <div class="paragraph">
-        <p>Similarly, in the list of Upstreams, our example upstream is appeared.</p>
-      </div>
-      <div class="imageblock">
-        <div class="content">
-          <img src="upstream-list-screenshot.png" alt="upstream list screenshot">
-        </div>
-      </div>
-      <div class="paragraph">
-        <p>So let&#8217;s create our first consumer I will press a button to create and give a consumer name in this case we can call it <em>Example Consumer</em> so click next</p>
-      </div>
-      <div class="imageblock">
-        <div class="content">
-          <img src="create-new-consumer-screenshot" alt="create new consumer screenshot">
-        </div>
-      </div>
-      <div class="imageblock">
-        <div class="content">
-          <img src="consumer-detail-screenshot.png" alt="consumer detail screenshot">
-        </div>
-      </div>
-      <div class="paragraph">
-        <p>And we will apply for this consumer the key auth, a key authentication and we need to enable from various plugins options I will choose authentication.</p>
-      </div>
-      <div class="imageblock">
-        <div class="content">
-          <img src="key-auth-plugin-enable-screenshot.png" alt="key auth plugin enable screenshot">
-        </div>
-      </div>
-      <div class="paragraph">
-        <p>Go to the Plugin Editor in order to enable this plugin I need to press enable button and click this toggle switch on
-          then I will just provide a key for the consumer like a key for example key of john and submit click next and submit.</p>
-      </div>
-      <div class="imageblock">
-        <div class="content">
-          <img src="plugin-config-example-screenshot.png" alt="plugin config example screenshot">
-        </div>
-      </div>
-      <div class="paragraph">
-        <p>So now as you can see we have example consumer.</p>
-      </div>
-      <div class="imageblock">
-        <div class="content">
-          <img src="example-consumer-created-screenshot.png" alt="example consumer created screenshot">
-        </div>
-      </div>
-      <div class="exampleblock">
-        <div class="content">
-          <div class="paragraph">
-            <p>By adding key authentication we are controlling the data that is allowed to be transmitted from our gateways and identifying unique consumers that are accessing our API now that the plugin is activated and any requests that do not include a valid API key will be automatically rejected with HTTP 401 status.</p>
+        <div class="imageblock">
+          <div class="content">
+            <img src="login-dashboard-screenshot.png" alt="login dashboard screenshot">
           </div>
         </div>
+        <div class="paragraph">
+          <p>After you logged in, go to Route page in the navigation bar on the left side.</p>
+        </div>
+        <div class="paragraph">
+          <p>As you can see in the below image, there is a route in the Route list that we created previously with curl commands.</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="route-list-screenshot.png" alt="route list screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Next, open Upstream page by navigating to Upstream option on the same bar.</p>
+        </div>
+        <div class="paragraph">
+          <p>Similarly, in the list of Upstreams, our example upstream is appeared.</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="upstream-list-screenshot.png" alt="upstream list screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>So let&#8217;s create our first consumer I will press a button to create and give a consumer name in this case we can call it <em>Example Consumer</em> so click next</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="create-new-consumer-screenshot" alt="create new consumer screenshot">
+          </div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="consumer-detail-screenshot.png" alt="consumer detail screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>And we will apply for this consumer the key auth, a key authentication and we need to enable from various plugins options I will choose authentication.</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="key-auth-plugin-enable-screenshot.png" alt="key auth plugin enable screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Go to the Plugin Editor in order to enable this plugin I need to press enable button and click this toggle switch on
+            then I will just provide a key for the consumer like a key for example key of john and submit click next and submit.</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="plugin-config-example-screenshot.png" alt="plugin config example screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>So now as you can see we have example consumer.</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="example-consumer-created-screenshot.png" alt="example consumer created screenshot">
+          </div>
+        </div>
+        <div class="exampleblock">
+          <div class="content">
+            <div class="paragraph">
+              <p>By adding key authentication we are controlling the data that is allowed to be transmitted from our gateways and identifying unique consumers that are accessing our API now that the plugin is activated and any requests that do not include a valid API key will be automatically rejected with HTTP 401 status.</p>
+            </div>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>To show this let&#8217;s move over to our terminal.</p>
+        </div>
       </div>
-      <div class="paragraph">
-        <p>To show this let&#8217;s move over to our terminal.</p>
+      <div class="sect2">
+        <h3 id="_enable_key_auth_plugin">Enable key-auth plugin</h3>
+        <div class="paragraph">
+          <p>To test this we can simply run following command:</p>
+        </div>
+        <div class="literalblock">
+          <div class="content">
+            <pre>curl -i -X GET "http://127.0.0.1:9080/anything/foo?arg=10" -H "Host: example.com"</pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>We want to access with GET HTTP method with specified parameters the endpoint.</p>
+        </div>
+        <div class="paragraph">
+          <p>We will obviously get an unauthorized error now it&#8217;s our API is secured, and we are missing API key</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="http-unauthorized-error-screenshot.png" alt="http unauthorized error screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>And what we can do we need to send the API key.
+            So let&#8217;s add to the end of my request API key of <em>Example Consumer</em> and press enter.</p>
+        </div>
+        <div class="literalblock">
+          <div class="content">
+            <pre>curl -i -X GET http://127.0.0.1:9080/get -H "Host: httpbin.org" -H "apikey: key-of-john"</pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Now as you can see I can access my API endpoint.</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="access-endpoint-with-consumer.png" alt="access endpoint with consumer">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>So far we have shown how you can use the power of Apache APISIX  to deploy configure and publish your API and secure
+            it as well all from a single user interface currently the dashboard.</p>
+        </div>
       </div>
     </div>
   </div>
 </div>
 <div id="footer">
   <div id="footer-text">
-    Last updated 2022-03-17 18:12:02 +0200
+    Last updated 2022-03-17 18:27:11 +0200
   </div>
 </div>
 </body>
