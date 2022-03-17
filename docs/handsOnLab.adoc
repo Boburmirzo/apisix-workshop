@@ -1,5 +1,5 @@
 = Hands-on lab Apache APISIX
-
+AsciiDoc article template
 :toc:
 :icons: font
 
@@ -55,10 +55,9 @@ Once the download is complete, execute the curl command on the host
 running Docker to access the Admin API, and determine if Apache APISIX
 was successfully started based on the returned data.
 
-____
-Note: Please execute the curl command on the host where you are running
+
+Please execute the curl command on the host where you are running
 Docker.
-____
 
 ....
 curl "http://127.0.0.1:9080/apisix/admin/services/" -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1'
@@ -124,14 +123,14 @@ curl "http://127.0.0.1:9080/apisix/admin/upstreams/1" -H "X-API-KEY: edd1c9f0343
 }'
 ....
 
-____
-Note: Creating an Upstream service is not actually necessary, as we can
+
+NOTE: Creating an Upstream service is not actually necessary, as we can
 use
 https://apisix.apache.org/docs/apisix/architecture-design/plugin/[Plugin]
 to intercept the request and then respond directly. However, for the
 purposes of this guide, we assume that at least one Upstream service
 needs to be set up.
-____
+
 
 == Bind the Route to the Upstream
 
@@ -148,7 +147,7 @@ curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f
 }'
 ....
 
-== Validation
+=== Validation
 
 We have created the route and the Upstream service and bound them. Now
 let’s access Apache APISIX to test this route.
@@ -172,7 +171,7 @@ More information about APISIX Dashboard can be found https://apisix.apache.org/d
 TIP: You can also watch you a video tutorial on YouTube https://youtu.be/-9-HZKK2ccI[Getting started with Apache APISIX Dashboard]. You can learn
 how to use the APISIX dashboard platform to manage your Admin API from a single simple user interface. Also, how to install Apache APISIX with Docker, how you can create a route, upstream and add authentication to your first Consumer service using the same Dashboard. The same steps we do here.
 
-== Add a new Consumer
+=== Add a new Consumer
 
 In the above steps, we created a new route, upstream and mapped the route to the upstream.
 
@@ -187,4 +186,75 @@ The same configuration we did via command-line interface can be achieved with th
 
 WARNING: The route we created is public. Thus, anyone can access this Upstream service as long as they know the address that Apache APISIX exposes to the outside world. This is unsafe, it creates certain security risks. In a practical application scenario, we need to add authentication to the route.
 
+Apache APISIX dashboard is running on the address http://localhost:9000/
+if you click and try to open the Apache APISIX dashboard you can see the dashboard is running
 
+====
+You can log into the dashboard by using *login* as _admin_ and *password* as an _admin_.
+====
+image::login-dashboard-screenshot.png[]
+
+After you logged in, go to Route page in the navigation bar on the left side.
+
+As you can see in the below image, there is a route in the Route list that we created previously with curl commands.
+
+image::route-list-screenshot.png[]
+
+Next, open Upstream page by navigating to Upstream option on the same bar.
+
+Similarly, in the list of Upstreams, our example upstream is appeared.
+
+image::upstream-list-screenshot.png[]
+
+So let's create our first consumer I will press a button to create and give a consumer name in this case we can call it _Example Consumer_ so click next
+
+image::create-new-consumer-screenshot[]
+
+image::consumer-detail-screenshot.png[]
+
+And we will apply for this consumer the key auth, a key authentication and we need to enable from various plugins options I will choose authentication.
+
+image::key-auth-plugin-enable-screenshot.png[]
+
+Go to the Plugin Editor in order to enable this plugin I need to press enable button and click this toggle switch on
+then I will just provide a key for the consumer like a key for example key of john and submit click next and submit.
+
+image::plugin-config-example-screenshot.png[]
+
+So now as you can see we have example consumer.
+
+image::example-consumer-created-screenshot.png[]
+
+====
+By adding key authentication we are controlling the data that is allowed to be transmitted from our gateways and identifying unique consumers that are accessing our API now that the plugin is activated and any requests that do not include a valid API key will be automatically rejected with HTTP 401 status.
+====
+To show this let's move over to our terminal.
+
+=== Enable key-auth plugin
+
+To test this we can simply run following command:
+
+....
+curl -i -X GET "http://127.0.0.1:9080/anything/foo?arg=10" -H "Host: example.com"
+....
+
+We want to access with GET HTTP method with specified parameters the endpoint.
+
+
+We will obviously get an unauthorized error now it's our API is secured, and we are missing API key
+
+image::http-unauthorized-error-screenshot.png[]
+
+And what we can do we need to send the API key.
+So let's add to the end of my request API key of _Example Consumer_ and press enter.
+
+....
+curl -i -X GET http://127.0.0.1:9080/get -H "Host: httpbin.org" -H "apikey: key-of-john"
+....
+
+Now as you can see I can access my API endpoint.
+
+image::access-endpoint-with-consumer.png[]
+
+So far we have shown how you can use the power of Apache APISIX  to deploy configure and publish your API and secure
+it as well all from a single user interface currently the dashboard.
