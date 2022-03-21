@@ -192,38 +192,38 @@ if you click and try to open the Apache APISIX dashboard you can see the dashboa
 ====
 You can log into the dashboard by using *login* as _admin_ and *password* as an _admin_.
 ====
-image::login-dashboard-screenshot.png[]
+image::../images/login-dashboard-screenshot.png[]
 
 After you logged in, go to Route page in the navigation bar on the left side.
 
 As you can see in the below image, there is a route in the Route list that we created previously with curl commands.
 
-image::route-list-screenshot.png[]
+image::../images/route-list-screenshot.png[]
 
 Next, open Upstream page by navigating to Upstream option on the same bar.
 
 Similarly, in the list of Upstreams, our example upstream is appeared.
 
-image::upstream-list-screenshot.png[]
+image::../images/upstream-list-screenshot.png[]
 
 So let's create our first consumer I will press a button to create and give a consumer name in this case we can call it _Example Consumer_ so click next
 
-image::create-new-consumer-screenshot[]
+image::../images/create-new-consumer-screenshot.png[]
 
-image::consumer-detail-screenshot.png[]
+image::../images/consumer-detail-screenshot.png[]
 
 And we will apply for this consumer the key auth, a key authentication and we need to enable from various plugins options I will choose authentication.
 
-image::key-auth-plugin-enable-screenshot.png[]
+image::../images/key-auth-plugin-enable-screenshot.png[]
 
 Go to the Plugin Editor in order to enable this plugin I need to press enable button and click this toggle switch on
 then I will just provide a key for the consumer like a key for example key of john and submit click next and submit.
 
-image::plugin-config-example-screenshot.png[]
+image::../images/plugin-config-example-screenshot.png[]
 
 So now as you can see we have example consumer.
 
-image::example-consumer-created-screenshot.png[]
+image::../images/example-consumer-created-screenshot.png[]
 
 ====
 By adding key authentication we are controlling the data that is allowed to be transmitted from our gateways and identifying unique consumers that are accessing our API now that the plugin is activated and any requests that do not include a valid API key will be automatically rejected with HTTP 401 status.
@@ -243,7 +243,7 @@ We want to access with GET HTTP method with specified parameters the endpoint.
 
 We will obviously get an unauthorized error now it's our API is secured, and we are missing API key
 
-image::http-unauthorized-error-screenshot.png[]
+image::../images/http-unauthorized-error-screenshot.png[]
 
 And what we can do we need to send the API key.
 So let's add to the end of my request API key of _Example Consumer_ and press enter.
@@ -254,7 +254,123 @@ curl -i -X GET http://127.0.0.1:9080/get -H "Host: httpbin.org" -H "apikey: key-
 
 Now as you can see I can access my API endpoint.
 
-image::access-endpoint-with-consumer.png[]
+image::../images/access-endpoint-with-consumer.png[]
 
 So far we have shown how you can use the power of Apache APISIX  to deploy configure and publish your API and secure
 it as well all from a single user interface currently the dashboard.
+
+== Plugins Usage
+
+=== JWT Plugin
+Apache APISIX API Gateway acts as a single entry point and offers
+many authentication plugins including:
+
+* https://apisix.apache.org/docs/apisix/plugins/basic-auth[HTTP Basic Auth]
+* https://apisix.apache.org/docs/apisix/plugins/key-auth[API Keys based Auth]
+* https://apisix.apache.org/docs/apisix/plugins/openid-connect[OpenID Connect]
+* https://apisix.apache.org/docs/apisix/plugins/hmac-auth[HMAC Auth]
+* https://apisix.apache.org/docs/apisix/plugins/ldap-auth[Ldap Authentication]
+* And more.
+
+https://apisix.apache.org/docs/apisix/plugins/jwt-auth[JWT (JSON Web Token) plugin] is one strategy for API gateway
+authentication. JWT simplifies authentication setup,
+allowing you to focus more on coding and less on security. Refer to https://jwt.io/[JWT] for more information.
+
+https://apisix.apache.org/docs/apisix/plugins/jwt-auth[Apache APISIX JWT Plugin] acts
+as an issuer and also validates the token on behalf of your API,
+so a developer does not have to add any code
+in your API to process the authentication.
+
+IMPORTANT: Your should disable key-auth plugin we enabled for _example-consumer_
+via dashboard in order to use another auth plugin. You can disable it via Dashboard or
+command line.
+
+Let's apply to our existing API JWT Auth plugin.
+
+Set to our existing _example_consumer_ plugin config the value of the jwt-auth as an option:
+
+[source,text]
+----
+curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    "username": "example_consumer",
+    "plugins": {
+        "jwt-auth": {
+            "key": "user-key",
+            "secret": "my-secret-key"
+        }
+    }
+}'
+----
+
+In the console, you will get a response likely below:
+
+image::../images/jwt-add-consumer-screenshot.png[]
+
+For the exising _Example route_ we created previously, enable jwt-auth plugin too:
+
+[source,text]
+----
+
+curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    "methods": ["GET"],
+    "uri": "/get",
+    "plugins": {
+        "jwt-auth": {}
+    },
+    "upstream_id": "1"
+}'
+----
+
+Output:
+
+image::../images/jwt-enable-plugin-route-screenshot.png[]
+
+==== Test Plugin
+
+Now we enabled JWT plugin, it is time to validate it.
+
+TIP: jwt-auth uses the HS256 algorithm by default, and if you use the RS256 algorithm, you need to specify the
+algorithm and configure the public key and private key,
+as it is described https://apisix.apache.org/docs/apisix/plugins/jwt-auth#:~:text=jwt%2Dauth%20uses%20the%20HS256%20algorithm[here].
+
+
+Run the following curl cmd to generate new JWT token:
+
+[source,text]
+----
+ curl http://127.0.0.1:9080/apisix/plugin/jwt/sign?key=user-key -i
+----
+
+Token is generated:
+
+image::../images/jwt-token-generated-screenshot.png[]
+
+Set generated token to your GET request:
+
+[source,text]
+----
+curl -i -X GET http://127.0.0.1:9080/get -H 'Authorization: <SET_GENERATED_TOKEN>'
+----
+
+Output with token:
+
+image::../images/access-endpoint-with-generated-token.png[]
+
+Obviously, if you try to access the same endpoint without token provided
+in the Header request, you will get HTTP Error _401 Unauthorized_
+
+Try it yourself:
+
+[source,text]
+----
+curl -i -X GET http://127.0.0.1:9080/get
+----
+
+Output without token:
+
+image::../images/access-without-jwt-token-screenshot.png[]
+
+As we tested, we can validate the identity of the client attempting to make a
+connection by using various authentication plugins with the help of Apache APISIX.

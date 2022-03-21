@@ -469,6 +469,11 @@
           <li><a href="#_enable_key_auth_plugin">Enable key-auth plugin</a></li>
         </ul>
       </li>
+      <li><a href="#_plugins_usage">Plugins Usage</a>
+        <ul class="sectlevel2">
+          <li><a href="#_jwt_plugin">JWT Plugin</a></li>
+        </ul>
+      </li>
     </ul>
   </div>
 </div>
@@ -787,7 +792,7 @@
         </div>
         <div class="imageblock">
           <div class="content">
-            <img src="login-dashboard-screenshot.png" alt="login dashboard screenshot">
+            <img src="../images/login-dashboard-screenshot.png" alt="login dashboard screenshot">
           </div>
         </div>
         <div class="paragraph">
@@ -798,7 +803,7 @@
         </div>
         <div class="imageblock">
           <div class="content">
-            <img src="route-list-screenshot.png" alt="route list screenshot">
+            <img src="../images/route-list-screenshot.png" alt="route list screenshot">
           </div>
         </div>
         <div class="paragraph">
@@ -809,7 +814,7 @@
         </div>
         <div class="imageblock">
           <div class="content">
-            <img src="upstream-list-screenshot.png" alt="upstream list screenshot">
+            <img src="../images/upstream-list-screenshot.png" alt="upstream list screenshot">
           </div>
         </div>
         <div class="paragraph">
@@ -817,12 +822,12 @@
         </div>
         <div class="imageblock">
           <div class="content">
-            <img src="create-new-consumer-screenshot" alt="create new consumer screenshot">
+            <img src="../images/create-new-consumer-screenshot.png" alt="create new consumer screenshot">
           </div>
         </div>
         <div class="imageblock">
           <div class="content">
-            <img src="consumer-detail-screenshot.png" alt="consumer detail screenshot">
+            <img src="../images/consumer-detail-screenshot.png" alt="consumer detail screenshot">
           </div>
         </div>
         <div class="paragraph">
@@ -830,7 +835,7 @@
         </div>
         <div class="imageblock">
           <div class="content">
-            <img src="key-auth-plugin-enable-screenshot.png" alt="key auth plugin enable screenshot">
+            <img src="../images/key-auth-plugin-enable-screenshot.png" alt="key auth plugin enable screenshot">
           </div>
         </div>
         <div class="paragraph">
@@ -839,7 +844,7 @@
         </div>
         <div class="imageblock">
           <div class="content">
-            <img src="plugin-config-example-screenshot.png" alt="plugin config example screenshot">
+            <img src="../images/plugin-config-example-screenshot.png" alt="plugin config example screenshot">
           </div>
         </div>
         <div class="paragraph">
@@ -847,7 +852,7 @@
         </div>
         <div class="imageblock">
           <div class="content">
-            <img src="example-consumer-created-screenshot.png" alt="example consumer created screenshot">
+            <img src="../images/example-consumer-created-screenshot.png" alt="example consumer created screenshot">
           </div>
         </div>
         <div class="exampleblock">
@@ -879,7 +884,7 @@
         </div>
         <div class="imageblock">
           <div class="content">
-            <img src="http-unauthorized-error-screenshot.png" alt="http unauthorized error screenshot">
+            <img src="../images/http-unauthorized-error-screenshot.png" alt="http unauthorized error screenshot">
           </div>
         </div>
         <div class="paragraph">
@@ -896,7 +901,7 @@
         </div>
         <div class="imageblock">
           <div class="content">
-            <img src="access-endpoint-with-consumer.png" alt="access endpoint with consumer">
+            <img src="../images/access-endpoint-with-consumer.png" alt="access endpoint with consumer">
           </div>
         </div>
         <div class="paragraph">
@@ -906,10 +911,197 @@
       </div>
     </div>
   </div>
+  <div class="sect1">
+    <h2 id="_plugins_usage">Plugins Usage</h2>
+    <div class="sectionbody">
+      <div class="sect2">
+        <h3 id="_jwt_plugin">JWT Plugin</h3>
+        <div class="paragraph">
+          <p>Apache APISIX API Gateway acts as a single entry point and offers
+            many authentication plugins including:</p>
+        </div>
+        <div class="ulist">
+          <ul>
+            <li>
+              <p><a href="https://apisix.apache.org/docs/apisix/plugins/basic-auth">HTTP Basic Auth</a></p>
+            </li>
+            <li>
+              <p><a href="https://apisix.apache.org/docs/apisix/plugins/key-auth">API Keys based Auth</a></p>
+            </li>
+            <li>
+              <p><a href="https://apisix.apache.org/docs/apisix/plugins/openid-connect">OpenID Connect</a></p>
+            </li>
+            <li>
+              <p><a href="https://apisix.apache.org/docs/apisix/plugins/hmac-auth">HMAC Auth</a></p>
+            </li>
+            <li>
+              <p><a href="https://apisix.apache.org/docs/apisix/plugins/ldap-auth">Ldap Authentication</a></p>
+            </li>
+            <li>
+              <p>And more.</p>
+            </li>
+          </ul>
+        </div>
+        <div class="paragraph">
+          <p><a href="https://apisix.apache.org/docs/apisix/plugins/jwt-auth">JWT (JSON Web Token) plugin</a> is one strategy for API gateway
+            authentication. JWT simplifies authentication setup,
+            allowing you to focus more on coding and less on security. Refer to <a href="https://jwt.io/">JWT</a> for more information.</p>
+        </div>
+        <div class="paragraph">
+          <p><a href="https://apisix.apache.org/docs/apisix/plugins/jwt-auth">Apache APISIX JWT Plugin</a> acts
+            as an issuer and also validates the token on behalf of your API,
+            so a developer does not have to add any code
+            in your API to process the authentication.</p>
+        </div>
+        <div class="admonitionblock important">
+          <table>
+            <tr>
+              <td class="icon">
+                <i class="fa icon-important" title="Important"></i>
+              </td>
+              <td class="content">
+                Your should disable key-auth plugin we enabled for <em>example-consumer</em>
+                via dashboard in order to use another auth plugin. You can disable it via Dashboard or
+                command line.
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="paragraph">
+          <p>Let&#8217;s apply to our existing API JWT Auth plugin.</p>
+        </div>
+        <div class="paragraph">
+          <p>Set to our existing <em>example_consumer</em> plugin config the value of the jwt-auth as an option:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    &quot;username&quot;: &quot;example_consumer&quot;,
+    &quot;plugins&quot;: {
+        &quot;jwt-auth&quot;: {
+            &quot;key&quot;: &quot;user-key&quot;,
+            &quot;secret&quot;: &quot;my-secret-key&quot;
+        }
+    }
+}'</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>In the console, you will get a response likely below:</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="../images/jwt-add-consumer-screenshot.png" alt="jwt add consumer screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>For the exising <em>Example route</em> we created previously, enable jwt-auth plugin too:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    &quot;methods&quot;: [&quot;GET&quot;],
+    &quot;uri&quot;: &quot;/get&quot;,
+    &quot;plugins&quot;: {
+        &quot;jwt-auth&quot;: {}
+    },
+    &quot;upstream_id&quot;: &quot;1&quot;
+}'</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Output:</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="../images/jwt-enable-plugin-route-screenshot.png" alt="jwt enable plugin route screenshot">
+          </div>
+        </div>
+        <div class="sect3">
+          <h4 id="_test_plugin">Test Plugin</h4>
+          <div class="paragraph">
+            <p>Now we enabled JWT plugin, it is time to validate it.</p>
+          </div>
+          <div class="admonitionblock tip">
+            <table>
+              <tr>
+                <td class="icon">
+                  <i class="fa icon-tip" title="Tip"></i>
+                </td>
+                <td class="content">
+                  jwt-auth uses the HS256 algorithm by default, and if you use the RS256 algorithm, you need to specify the
+                  algorithm and configure the public key and private key,
+                  as it is described <a href="https://apisix.apache.org/docs/apisix/plugins/jwt-auth#:~:text=jwt%2Dauth%20uses%20the%20HS256%20algorithm">here</a>.
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="paragraph">
+            <p>Run the following curl cmd to generate new JWT token:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="CodeRay highlight"><code data-lang="text"> curl http://127.0.0.1:9080/apisix/plugin/jwt/sign?key=user-key -i</code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Token is generated:</p>
+          </div>
+          <div class="imageblock">
+            <div class="content">
+              <img src="../images/jwt-token-generated-screenshot.png" alt="jwt token generated screenshot">
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Set generated token to your GET request:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="CodeRay highlight"><code data-lang="text">curl -i -X GET http://127.0.0.1:9080/get -H 'Authorization: &lt;SET_GENERATED_TOKEN&gt;'</code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Output with token:</p>
+          </div>
+          <div class="imageblock">
+            <div class="content">
+              <img src="../images/access-endpoint-with-generated-token.png" alt="access endpoint with generated token">
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Obviously, if you try to access the same endpoint without token provided
+              in the Header request, you will get HTTP Error <em>401 Unauthorized</em></p>
+          </div>
+          <div class="paragraph">
+            <p>Try it yourself:</p>
+          </div>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="CodeRay highlight"><code data-lang="text">curl -i -X GET http://127.0.0.1:9080/get</code></pre>
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>Output without token:</p>
+          </div>
+          <div class="imageblock">
+            <div class="content">
+              <img src="../images/access-without-jwt-token-screenshot.png" alt="access without jwt token screenshot">
+            </div>
+          </div>
+          <div class="paragraph">
+            <p>As we tested, we can validate the identity of the client attempting to make a
+              connection by using various authentication plugins with the help of Apache APISIX.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <div id="footer">
   <div id="footer-text">
-    Last updated 2022-03-17 18:27:11 +0200
+    Last updated 2022-03-21 21:35:41 +0200
   </div>
 </div>
 </body>
