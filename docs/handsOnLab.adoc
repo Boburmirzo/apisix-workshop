@@ -374,3 +374,74 @@ image::access-without-jwt-token-screenshot.png[]
 
 As we tested, we can validate the identity of the client attempting to make a
 connection by using various authentication plugins with the help of Apache APISIX.
+
+=== IP Restriction Plugin
+
+API security refers to the practice of preventing or mitigating attacks on APIs. In our modern era, API
+security has become increasingly important. There are many API security best practices such as making use of
+TLS encryption, setting API Firewalls, validating request data, throttling for protection, continuously monitoring,
+auditing, logging or a dedicated API Gateway deployment where you can secure the API traffic from beginning to end.
+
+Also, https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Apache APISIX IP Restrictions Plugin] can be enabled for security reasons, wherein, the users will be allowed to login only
+from a range of IP addresses as defined by the system or administrators. If the user tries to log in outside
+the allowed range, the system throws an error, and login will not be possible.
+
+Let's enable `ip-restriction` plugin for our existing _example route_.
+
+[source,text]
+----
+curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    "uri": "/get",
+    "upstream_id": "1",
+    "plugins": {
+        "ip-restriction": {
+            "whitelist": [
+                "127.0.0.1",
+                "113.74.26.106/24"
+            ]
+        }
+    }
+}'
+----
+
+
+Output:
+
+image::ip-restrictions-enable-plugin-screenshot.png[]
+
+Now we enabled IP restriction by whitelisting only certain IP addresses, and other requests from different
+IP addresses will be rejected simply.
+
+[source,text]
+----
+curl http://127.0.0.1:9080/get -i --interface 127.0.0.2
+----
+
+Output:
+
+image::ip-restrictions-plugin-test-result-screenshot.png[]
+
+TIP: Default returns `{"message":"Your IP address is not allowed"}` when unallowed IP access. If you want to use a custom message, you can configure it in the plugin section.
+
+As you can see from the output, we can not access our API with IPs other than whitelisted ones.
+
+Similarly, with the plugin, you can also add IP addresses to blacklist by changing the previous request.
+
+When you want to disable the ip-restriction plugin (Another plugin), it is very simple, you can delete the corresponding
+json configuration from the plugin configuration, no need to restart the service (Since Apache APISIX Plugin supports
+hot reloading), it will take effect immediately:
+
+[source,text]
+----
+curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    "uri": "/get",
+    "plugins": {},
+    "upstream_id": "1"
+}'
+----
+
+Output:
+
+image::ip-restrictions-plugin-test-result-disabled-screenshot.png[]

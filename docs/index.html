@@ -472,6 +472,7 @@
       <li><a href="#_plugins_usage">Plugins Usage</a>
         <ul class="sectlevel2">
           <li><a href="#_jwt_plugin">JWT Plugin</a></li>
+          <li><a href="#_ip_restriction_plugin">IP Restriction Plugin</a></li>
         </ul>
       </li>
     </ul>
@@ -1096,12 +1097,112 @@
           </div>
         </div>
       </div>
+      <div class="sect2">
+        <h3 id="_ip_restriction_plugin">IP Restriction Plugin</h3>
+        <div class="paragraph">
+          <p>API security refers to the practice of preventing or mitigating attacks on APIs. In our modern era, API
+            security has become increasingly important. There are many API security best practices such as making use of
+            TLS encryption, setting API Firewalls, validating request data, throttling for protection, continuously monitoring,
+            auditing, logging or a dedicated API Gateway deployment where you can secure the API traffic from beginning to end.</p>
+        </div>
+        <div class="paragraph">
+          <p>Also, <a href="https://apisix.apache.org/docs/apisix/plugins/ip-restriction/">Apache APISIX IP Restrictions Plugin</a> can be enabled for security reasons, wherein, the users will be allowed to login only
+            from a range of IP addresses as defined by the system or administrators. If the user tries to log in outside
+            the allowed range, the system throws an error, and login will not be possible.</p>
+        </div>
+        <div class="paragraph">
+          <p>Let&#8217;s enable <code>ip-restriction</code> plugin for our existing <em>example route</em>.</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    &quot;uri&quot;: &quot;/get&quot;,
+    &quot;upstream_id&quot;: &quot;1&quot;,
+    &quot;plugins&quot;: {
+        &quot;ip-restriction&quot;: {
+            &quot;whitelist&quot;: [
+                &quot;127.0.0.1&quot;,
+                &quot;113.74.26.106/24&quot;
+            ]
+        }
+    }
+}'</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Output:</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="ip-restrictions-enable-plugin-screenshot.png" alt="ip restrictions enable plugin screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Now we enabled IP restriction by whitelisting only certain IP addresses, and other requests from different
+            IP addresses will be rejected simply.</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="CodeRay highlight"><code data-lang="text">curl http://127.0.0.1:9080/get -i --interface 127.0.0.2</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Output:</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="ip-restrictions-plugin-test-result-screenshot.png" alt="ip restrictions plugin test result screenshot">
+          </div>
+        </div>
+        <div class="admonitionblock tip">
+          <table>
+            <tr>
+              <td class="icon">
+                <i class="fa icon-tip" title="Tip"></i>
+              </td>
+              <td class="content">
+                Default returns <code>{"message":"Your IP address is not allowed"}</code> when unallowed IP access. If you want to use a custom message, you can configure it in the plugin section.
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="paragraph">
+          <p>As you can see from the output, we can not access our API with IPs other than whitelisted ones.</p>
+        </div>
+        <div class="paragraph">
+          <p>Similarly, with the plugin, you can also add IP addresses to blacklist by changing the previous request.</p>
+        </div>
+        <div class="paragraph">
+          <p>When you want to disable the ip-restriction plugin (Another plugin), it is very simple, you can delete the corresponding
+            json configuration from the plugin configuration, no need to restart the service (Since Apache APISIX Plugin supports
+            hot reloading), it will take effect immediately:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    &quot;uri&quot;: &quot;/get&quot;,
+    &quot;plugins&quot;: {},
+    &quot;upstream_id&quot;: &quot;1&quot;
+}'</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Output:</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="ip-restrictions-plugin-test-result-disabled-screenshot.png" alt="ip restrictions plugin test result disabled screenshot">
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <div id="footer">
   <div id="footer-text">
-    Last updated 2022-03-21 21:35:41 +0200
+    Last updated 2022-03-23 18:20:21 +0200
   </div>
 </div>
 </body>
