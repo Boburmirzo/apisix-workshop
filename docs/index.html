@@ -473,6 +473,7 @@
         <ul class="sectlevel2">
           <li><a href="#_jwt_plugin">JWT Plugin</a></li>
           <li><a href="#_ip_restriction_plugin">IP Restriction Plugin</a></li>
+          <li><a href="#_limit_count_plugin">Limit Count Plugin</a></li>
         </ul>
       </li>
     </ul>
@@ -948,11 +949,15 @@
             authentication. JWT simplifies authentication setup,
             allowing you to focus more on coding and less on security. Refer to <a href="https://jwt.io/">JWT</a> for more information.</p>
         </div>
-        <div class="paragraph">
-          <p><a href="https://apisix.apache.org/docs/apisix/plugins/jwt-auth">Apache APISIX JWT Plugin</a> acts
-            as an issuer and also validates the token on behalf of your API,
-            so a developer does not have to add any code
-            in your API to process the authentication.</p>
+        <div class="exampleblock">
+          <div class="content">
+            <div class="paragraph">
+              <p><a href="https://apisix.apache.org/docs/apisix/plugins/jwt-auth">Apache APISIX JWT Plugin</a> acts
+                as an issuer and also validates the token on behalf of your API,
+                so a developer does not have to add any code
+                in your API to process the authentication.</p>
+            </div>
+          </div>
         </div>
         <div class="admonitionblock important">
           <table>
@@ -1105,10 +1110,14 @@
             TLS encryption, setting API Firewalls, validating request data, throttling for protection, continuously monitoring,
             auditing, logging or a dedicated API Gateway deployment where you can secure the API traffic from beginning to end.</p>
         </div>
-        <div class="paragraph">
-          <p>Also, <a href="https://apisix.apache.org/docs/apisix/plugins/ip-restriction/">Apache APISIX IP Restrictions Plugin</a> can be enabled for security reasons, wherein, the users will be allowed to login only
-            from a range of IP addresses as defined by the system or administrators. If the user tries to log in outside
-            the allowed range, the system throws an error, and login will not be possible.</p>
+        <div class="exampleblock">
+          <div class="content">
+            <div class="paragraph">
+              <p>Also, <a href="https://apisix.apache.org/docs/apisix/plugins/ip-restriction/">Apache APISIX IP Restrictions Plugin</a> can be enabled for security reasons, wherein, the users will be allowed to login only
+                from a range of IP addresses as defined by the system or administrators. If the user tries to log in outside
+                the allowed range, the system throws an error, and login will not be possible.</p>
+            </div>
+          </div>
         </div>
         <div class="paragraph">
           <p>Let&#8217;s enable <code>ip-restriction</code> plugin for our existing <em>example route</em>.</p>
@@ -1197,12 +1206,122 @@
           </div>
         </div>
       </div>
+      <div class="sect2">
+        <h3 id="_limit_count_plugin">Limit Count Plugin</h3>
+        <div class="paragraph">
+          <p>API traffic management can improve the overall visibility of your system and allow you to better understand just
+            what is going on throughout your organization. And, after you have a better sense of your system’s activities,
+            you’ll have an opportunity to use that information to solve problems directly.</p>
+        </div>
+        <div class="paragraph">
+          <p>With the help of API Gateway, you can set automatic retries, timeouts, circuit breakers or rate limiting.
+            Rate limiting is a strategy for limiting network traffic. It puts a cap on how often someone can repeat an action
+            within a certain timeframe – for instance, trying to log into an account.</p>
+        </div>
+        <div class="exampleblock">
+          <div class="content">
+            <div class="paragraph">
+              <p><a href="https://apisix.apache.org/docs/apisix/plugins/limit-count/">Limit count plugin</a> is one type of request limiting plugins. It limits request-rate
+                by a fixed number of requests in a given time window. It means how many HTTP requests
+                can be made in a given period of seconds, minutes, hours, days, months, or years.</p>
+            </div>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Let&#8217;s enable <code>limit-count</code> plugin on the specified route before. To do so, please run the following cmd:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">curl -i http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    &quot;uri&quot;: &quot;/get&quot;,
+    &quot;plugins&quot;: {
+        &quot;limit-count&quot;: {
+            &quot;count&quot;: 2,
+            &quot;time_window&quot;: 60,
+            &quot;rejected_code&quot;: 503,
+            &quot;key_type&quot;: &quot;var&quot;,
+            &quot;key&quot;: &quot;remote_addr&quot;
+        }
+    },
+    &quot;upstream_id&quot;: &quot;1&quot;
+}'</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Output:</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="limit-count-plugin-enable-screenshot.png" alt="limit count plugin enable screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>The above configuration limits access to only 2 times in 60 seconds.
+            The first two visits will be normally accepted. Let&#8217;s see:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="CodeRay highlight"><code data-lang="text">curl -i http://127.0.0.1:9080/get</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>But when you visit for the third time, you will receive a response with the 503 HTTP code:</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="limit-count-plugin-enable-access-failed-screenshot.png" alt="limit count plugin enable access failed screenshot">
+          </div>
+        </div>
+        <div class="admonitionblock tip">
+          <table>
+            <tr>
+              <td class="icon">
+                <i class="fa icon-tip" title="Tip"></i>
+              </td>
+              <td class="content">
+                If you set the property <em>rejected_msg</em> in your request to custom message, for example,
+                "<em>Requests are too frequent, please try again later.</em>",
+                when you visit for the third time, you will receive a response body like below:
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">HTTP/1.1 503 Service Temporarily Unavailable
+Content-Type: text/html
+Content-Length: 194
+Connection: keep-alive
+Server: APISIX web server
+
+{&quot;error_msg&quot;:&quot;Requests are too frequent, please try again later.&quot;}</code></pre>
+          </div>
+        </div>
+        <div class="admonitionblock tip">
+          <table>
+            <tr>
+              <td class="icon">
+                <i class="fa icon-tip" title="Tip"></i>
+              </td>
+              <td class="content">
+                You also can complete the above operation through the web interface, first add a route, then add limit-count plugin:
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="limit-count-plugin-enable-with-dashboard-screenshot.png" alt="limit count plugin enable with dashboard screenshot">
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <div id="footer">
   <div id="footer-text">
-    Last updated 2022-03-23 18:20:21 +0200
+    Last updated 2022-03-24 18:15:34 +0200
   </div>
 </div>
 </body>

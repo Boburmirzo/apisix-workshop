@@ -276,10 +276,12 @@ https://apisix.apache.org/docs/apisix/plugins/jwt-auth[JWT (JSON Web Token) plug
 authentication. JWT simplifies authentication setup,
 allowing you to focus more on coding and less on security. Refer to https://jwt.io/[JWT] for more information.
 
+====
 https://apisix.apache.org/docs/apisix/plugins/jwt-auth[Apache APISIX JWT Plugin] acts
 as an issuer and also validates the token on behalf of your API,
 so a developer does not have to add any code
 in your API to process the authentication.
+====
 
 IMPORTANT: Your should disable key-auth plugin we enabled for _example-consumer_
 via dashboard in order to use another auth plugin. You can disable it via Dashboard or
@@ -382,9 +384,11 @@ security has become increasingly important. There are many API security best pra
 TLS encryption, setting API Firewalls, validating request data, throttling for protection, continuously monitoring,
 auditing, logging or a dedicated API Gateway deployment where you can secure the API traffic from beginning to end.
 
+====
 Also, https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Apache APISIX IP Restrictions Plugin] can be enabled for security reasons, wherein, the users will be allowed to login only
 from a range of IP addresses as defined by the system or administrators. If the user tries to log in outside
 the allowed range, the system throws an error, and login will not be possible.
+====
 
 Let's enable `ip-restriction` plugin for our existing _example route_.
 
@@ -445,3 +449,74 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 Output:
 
 image::ip-restrictions-plugin-test-result-disabled-screenshot.png[]
+
+=== Limit Count Plugin
+
+API traffic management can improve the overall visibility of your system and allow you to better understand just
+what is going on throughout your organization. And, after you have a better sense of your system’s activities,
+you’ll have an opportunity to use that information to solve problems directly.
+
+With the help of API Gateway, you can set automatic retries, timeouts, circuit breakers or rate limiting.
+Rate limiting is a strategy for limiting network traffic. It puts a cap on how often someone can repeat an action
+within a certain timeframe – for instance, trying to log into an account.
+
+====
+https://apisix.apache.org/docs/apisix/plugins/limit-count/[Limit count plugin] is one type of request limiting plugins. It limits request-rate
+by a fixed number of requests in a given time window. It means how many HTTP requests
+can be made in a given period of seconds, minutes, hours, days, months, or years.
+====
+
+Let's enable `limit-count` plugin on the specified route before. To do so, please run the following cmd:
+
+[source,text]
+----
+curl -i http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    "uri": "/get",
+    "plugins": {
+        "limit-count": {
+            "count": 2,
+            "time_window": 60,
+            "rejected_code": 503,
+            "key_type": "var",
+            "key": "remote_addr"
+        }
+    },
+    "upstream_id": "1"
+}'
+----
+
+Output:
+
+image::limit-count-plugin-enable-screenshot.png[]
+
+The above configuration limits access to only 2 times in 60 seconds.
+The first two visits will be normally accepted. Let's see:
+
+[source,text]
+----
+curl -i http://127.0.0.1:9080/get
+----
+
+But when you visit for the third time, you will receive a response with the 503 HTTP code:
+
+image::limit-count-plugin-enable-access-failed-screenshot.png[]
+
+TIP: If you set the property _rejected_msg_ in your request to custom message, for example,
+"_Requests are too frequent, please try again later._",
+when you visit for the third time, you will receive a response body like below:
+
+[source,text]
+----
+HTTP/1.1 503 Service Temporarily Unavailable
+Content-Type: text/html
+Content-Length: 194
+Connection: keep-alive
+Server: APISIX web server
+
+{"error_msg":"Requests are too frequent, please try again later."}
+----
+
+TIP: You also can complete the above operation through the web interface, first add a route, then add limit-count plugin:
+
+image::limit-count-plugin-enable-with-dashboard-screenshot.png[]
