@@ -476,6 +476,7 @@
           <li><a href="#_ip_restriction_plugin">IP Restriction Plugin</a></li>
           <li><a href="#_limit_count_plugin">Limit Count Plugin</a></li>
           <li><a href="#_http_logger_plugin">HTTP Logger Plugin</a></li>
+          <li><a href="#_prometheus_plugin">Prometheus plugin</a></li>
         </ul>
       </li>
     </ul>
@@ -1369,12 +1370,175 @@ Server: APISIX web server
           </div>
         </div>
       </div>
+      <div class="sect2">
+        <h3 id="_prometheus_plugin">Prometheus plugin</h3>
+        <div class="paragraph">
+          <p>API monitoring is the process of collecting and analyzing data about the performance of an API to identify problems that impact users. If an application is running slowly, you must first understand the cause before you can correct it.</p>
+        </div>
+        <div class="paragraph">
+          <p>Modern applications use many independent microservices instead of a few large ones, and one poor-performing service can adversely impact the overall performance of an application. In addition, isolating a single poor-performing service among hundreds can be a challenge unless proper monitoring is in place. This makes API monitoring and measuring API performance a crucial practice for modern multi-cloud environments.</p>
+        </div>
+        <div class="exampleblock">
+          <div class="content">
+            <div class="paragraph">
+              <p><a href="https://apisix.apache.org/docs/apisix/plugins/prometheus/" target="_blank" rel="noopener">Prometheus plugin</a>
+                can fetch API metrics data and you can show metrics exported by the plugin in <a href="https://grafana.com/" target="_blank" rel="noopener">Grafana</a>.</p>
+            </div>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Let&#8217;s enable <code>prometheus</code> plugin for our route:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/routes/1  -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    &quot;uri&quot;: &quot;/get&quot;,
+    &quot;plugins&quot;: {
+        &quot;prometheus&quot;:{}
+    },
+    &quot;upstream_id&quot;: &quot;1&quot;
+}'</code></pre>
+          </div>
+        </div>
+        <div class="admonitionblock note">
+          <table>
+            <tr>
+              <td class="icon">
+                <i class="fa icon-note" title="Note"></i>
+              </td>
+              <td class="content">
+                <div class="paragraph">
+                  <p>When set <em>prefer_name</em> to true in the request attribute, it will print route/service name instead of id in Prometheus metric.</p>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="paragraph">
+          <p>Response:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span style="color:#606"><span style="color:#404">&quot;</span><span>node</span><span style="color:#404">&quot;</span></span>: {
+    <span style="color:#606"><span style="color:#404">&quot;</span><span>value</span><span style="color:#404">&quot;</span></span>: {
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>update_time</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1648206467</span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>uri</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">/get</span><span style="color:#710">&quot;</span></span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>create_time</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1646341656</span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>status</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1</span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>priority</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">0</span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>plugins</span><span style="color:#404">&quot;</span></span>: {
+        <span style="color:#606"><span style="color:#404">&quot;</span><span>prometheus</span><span style="color:#404">&quot;</span></span>: {
+          <span style="color:#606"><span style="color:#404">&quot;</span><span>prefer_name</span><span style="color:#404">&quot;</span></span>: <span style="color:#088">false</span>
+        }
+      },
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>upstream_id</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">1</span><span style="color:#710">&quot;</span></span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>id</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">1</span><span style="color:#710">&quot;</span></span>
+    },
+    <span style="color:#606"><span style="color:#404">&quot;</span><span>key</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">/apisix/routes/1</span><span style="color:#710">&quot;</span></span>
+  },
+  <span style="color:#606"><span style="color:#404">&quot;</span><span>action</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">set</span><span style="color:#710">&quot;</span></span>
+}</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>We fetch the metric data from the specified url <code>/apisix/prometheus/metrics</code>.</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre class="CodeRay highlight"><code data-lang="bash">curl -i http://127.0.0.1:9091/apisix/prometheus/metrics</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>You will get response with Prometheus metrics something like below:</p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">HTTP/1.1 200 OK
+Server: openresty
+Date: Fri, 25 Mar 2022 11:13:14 GMT
+Content-Type: text/plain; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+
+# HELP apisix_batch_process_entries batch process remaining entries
+# TYPE apisix_batch_process_entries gauge
+apisix_batch_process_entries{name=&quot;http logger&quot;,route_id=&quot;1&quot;,server_addr=&quot;172.19.0.8&quot;} 0
+# HELP apisix_etcd_modify_indexes Etcd modify index for APISIX keys
+# TYPE apisix_etcd_modify_indexes gauge
+apisix_etcd_modify_indexes{key=&quot;consumers&quot;} 17819
+apisix_etcd_modify_indexes{key=&quot;global_rules&quot;} 17832
+apisix_etcd_modify_indexes{key=&quot;max_modify_index&quot;} 20028
+apisix_etcd_modify_indexes{key=&quot;prev_index&quot;} 18963
+apisix_etcd_modify_indexes{key=&quot;protos&quot;} 0
+apisix_etcd_modify_indexes{key=&quot;routes&quot;} 20028
+apisix_etcd_modify_indexes{key=&quot;services&quot;} 0
+apisix_etcd_modify_indexes{key=&quot;ssls&quot;} 0
+apisix_etcd_modify_indexes{key=&quot;stream_routes&quot;} 0
+apisix_etcd_modify_indexes{key=&quot;upstreams&quot;} 7342
+apisix_etcd_modify_indexes{key=&quot;x_etcd_index&quot;} 20033
+
+...</code></pre>
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>And we can also check the status of our endpoint at Prometheus dashboard by pointing to this
+            URL <code><a href="http://localhost:9090/targets" class="bare">http://localhost:9090/targets</a></code></p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="prometheus-plugin-dashboard-screenshot.png" alt="prometheus plugin dashboard screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>As you can see, Apache APISIX exposed metrics endpoint is upon and running.</p>
+        </div>
+        <div class="paragraph">
+          <p>Now you can query metrics for <code>apisix_http_status</code> to see what http requests are handled by API Gateway and what was outcome.</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="prometheus-plugin-dashboard-query-http-status-screenshot.png" alt="prometheus plugin dashboard query http status screenshot">
+          </div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="prometheus-plugin-dashboard-query-http-status-table-screenshot.png" alt="prometheus plugin dashboard query http status table screenshot">
+          </div>
+        </div>
+        <div class="admonitionblock note">
+          <table>
+            <tr>
+              <td class="icon">
+                <i class="fa icon-note" title="Note"></i>
+              </td>
+              <td class="content">
+                <div class="paragraph">
+                  <p>Metrics exported by the plugin can be visualized in Grafana using a drop in <a href="https://grafana.com/grafana/dashboards/11719" target="_blank" rel="noopener">Apache APISIX Grafana Dashboard Template</a></p>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="paragraph">
+          <p>In addition to this, you can view Grafana dashboard running in your local instance. Go to <code><a href="http://localhost:3000/" class="bare">http://localhost:3000/</a></code></p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="prometheus-plugin-grafana-dashboard-screenshot.png" alt="prometheus plugin grafana dashboard screenshot">
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Behind the scene, Apache APISIX downloads <a href="https://github.com/apache/apisix/blob/master/docs/assets/other/json/apisix-grafana-dashboard.json">Grafana dashboard meta</a>, imports it to Grafana and fetches real time metrics from Prometheus plugin.</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <div id="footer">
   <div id="footer-text">
-    Last updated 2022-03-25 12:38:00 +0200
+    Last updated 2022-03-25 16:09:43 +0200
   </div>
 </div>
 </body>
