@@ -1,5 +1,6 @@
 = Hands-on lab Apache APISIX
-AsciiDoc article template
+Bobur Umurzokov <boburmirzo.umurzokov@gmail.com>
+
 :toc:
 :icons: font
 
