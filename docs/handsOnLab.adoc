@@ -21,9 +21,9 @@ In this session, we will use https://apisix.apache.org/docs/apisix/how-to-build[
 
 Some core concepts should be learned before you create some configurations to let Apache APISIX work as per your needs.
 
-1. https://apisix.apache.org/docs/apisix/architecture-design/route/[Route^] is the most important concept in Apache APISIX, it guides APISIX to forward traffic to the correct backends.
-2. https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream^] is the view of backend microservices from APISIX point of view.
-3. https://apisix.apache.org/docs/apisix/architecture-design/plugin/[Plugin^] is a mechanism to manage traffic ( authentication, authorization, and so on) on the APISIX side.
+. https://apisix.apache.org/docs/apisix/architecture-design/route/[Route^] is the most important concept in Apache APISIX, it guides APISIX to forward traffic to the correct backends.
+. https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream^] is the view of backend microservices from APISIX point of view.
+. https://apisix.apache.org/docs/apisix/architecture-design/plugin/[Plugin^] is a mechanism to manage traffic ( authentication, authorization, and so on) on the APISIX side.
 
 == Pre-requisites
 
