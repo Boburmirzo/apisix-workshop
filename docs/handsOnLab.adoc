@@ -185,6 +185,7 @@ Apache APISIX dashboard is running on the address http://localhost:9000/ if you 
 
 You can log into the dashboard by using *login* as _admin_ and *password* as an _admin_.
 
+[.text-center]
 image::login-dashboard-screenshot.png[]
 
 After you logged in, go to Route page in the navigation bar on the left side.
