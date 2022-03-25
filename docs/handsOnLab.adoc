@@ -438,9 +438,9 @@ With the help of API Gateway, you can set automatic retries, timeouts, circuit b
 Rate limiting is a strategy for limiting network traffic. It puts a cap on how often someone can repeat an action within a certain timeframe – for instance, trying to log into an account.
 
 ====
-https://apisix.apache.org/docs/apisix/plugins/limit-count/[Limit count plugin^] is one type of request limiting plugins. It limits request-rate
-by a fixed number of requests in a given time window. It means how many HTTP requests
-can be made in a given period of seconds, minutes, hours, days, months, or years.
+https://apisix.apache.org/docs/apisix/plugins/limit-count/[Limit count plugin^] is one type of request limiting plugins.
+It limits request-rate by a fixed number of requests in a given time window.
+It means how many HTTP requests can be made in a given period of seconds, minutes, hours, days, months, or years.
 ====
 
 Let's enable `limit-count` plugin on the specified route before. To do so, please run the following cmd:
