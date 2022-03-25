@@ -1,6 +1,5 @@
 = Hands-on lab Apache APISIX
 Bobur Umurzokov <boburmirzo.umurzokov@gmail.com>
-
 :toc:
 :icons: font
 :experimental: true
