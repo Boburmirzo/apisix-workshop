@@ -153,7 +153,7 @@ It returns data from our Upstream service (actually httpbin.org) and the result 
 
 == APISIX Dashboard
 
-__Apache APISIX__ provides a https://github.com/apache/apisix-dashboard[Dashboard^] to make our operation more intuitive and easier on UI.
+_Apache APISIX_ provides a https://github.com/apache/apisix-dashboard[Dashboard^] to make our operation more intuitive and easier on UI.
 
 More information about APISIX Dashboard can be found https://apisix.apache.org/docs/dashboard/USER_GUIDE[here^].
 
