@@ -6,8 +6,8 @@ Bobur Umurzokov <boburmirzo.umurzokov@gmail.com>
 
 == Welcome
 
-Welcome to Hands-on lab https://apisix.apache.org/[Apache APISIX]!
-In this session, we will use https://apisix.apache.org/docs/apisix/how-to-build[Apache APISIX on Docker] to show a couple of nifty features that can help your information system cope with the challenges introduced by APIs.
+Welcome to Hands-on lab https://apisix.apache.org/[Apache APISIX^]!
+In this session, we will use https://apisix.apache.org/docs/apisix/how-to-build[Apache APISIX on Docker^] to show a couple of nifty features that can help your information system cope with the challenges introduced by APIs.
 
 * Routing your calls to the correct upstream
 * Available abstractions: Route, Upstream, Service
@@ -21,28 +21,28 @@ In this session, we will use https://apisix.apache.org/docs/apisix/how-to-build[
 
 Some core concepts should be learned before you create some configurations to let Apache APISIX work as per your needs.
 
-1. https://apisix.apache.org/docs/apisix/architecture-design/route/[Route] is the most important concept in Apache APISIX, it guides APISIX to forward traffic to the correct backends.
-2. https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream] is the view of backend microservices from APISIX point of view.
-3. https://apisix.apache.org/docs/apisix/architecture-design/plugin/[Plugin] is a mechanism to manage traffic ( authentication, authorization, and so on) on the APISIX side.
+1. https://apisix.apache.org/docs/apisix/architecture-design/route/[Route^] is the most important concept in Apache APISIX, it guides APISIX to forward traffic to the correct backends.
+2. https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream^] is the view of backend microservices from APISIX point of view.
+3. https://apisix.apache.org/docs/apisix/architecture-design/plugin/[Plugin^] is a mechanism to manage traffic ( authentication, authorization, and so on) on the APISIX side.
 
 == Pre-requisites
 
-* Installed https://www.docker.com/[Docker] and https://docs.docker.com/compose/[Docker Compose] component.
-* We use the https://curl.se/docs/manpage.html[curl] command for API testing.
+* Installed https://www.docker.com/[Docker^] and https://docs.docker.com/compose/[Docker Compose^] component.
+* We use the https://curl.se/docs/manpage.html[curl^] command for API testing.
 You can also use other tools such as Postman for testing.
 
 == Install Apache APISIX
 
 Download the Docker image of Apache APISIXgit clone.
 
-[source,bash]
+[source,bash^]
 ----
 git clone https://github.com/apache/apisix-docker.git
 ----
 
 Switch the current directory to the apisix-docker/example path.
 
-[source,bash]
+[source,bash^]
 ----
 cd apisix-docker/example
 ----
@@ -72,7 +72,7 @@ Route.
 
 === How it works
 
-We can create a https://apisix.apache.org/docs/apisix/architecture-design/route/[Route] and connect it to an https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream] service(also known as the Upstream).
+We can create a https://apisix.apache.org/docs/apisix/architecture-design/route/[Route^] and connect it to an https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream^] service(also known as the Upstream).
 When a Request arrives at Apache APISIX, Apache APISIX knows which Upstream the request should be forwarded to.
 
 === Route Configuration
@@ -121,7 +121,7 @@ curl "http://127.0.0.1:9080/apisix/admin/upstreams/1" -H "X-API-KEY: edd1c9f0343
 ----
 
 
-NOTE: Creating an Upstream service is not actually necessary, as we can use https://apisix.apache.org/docs/apisix/architecture-design/plugin/[Plugin] to intercept the request and then respond directly.
+NOTE: Creating an Upstream service is not actually necessary, as we can use https://apisix.apache.org/docs/apisix/architecture-design/plugin/[Plugin^] to intercept the request and then respond directly.
 However, for the purposes of this guide, we assume that at least one Upstream service needs to be set up.
 
 
@@ -153,11 +153,11 @@ It returns data from our Upstream service (actually httpbin.org) and the result 
 
 == APISIX Dashboard
 
-__Apache APISIX__ provides a https://github.com/apache/apisix-dashboard[Dashboard] to make our operation more intuitive and easier on UI.
+__Apache APISIX__ provides a https://github.com/apache/apisix-dashboard[Dashboard^] to make our operation more intuitive and easier on UI.
 
-More information about APISIX Dashboard can be found https://apisix.apache.org/docs/dashboard/USER_GUIDE[here].
+More information about APISIX Dashboard can be found https://apisix.apache.org/docs/dashboard/USER_GUIDE[here^].
 
-TIP: You can also watch you a video tutorial on YouTube https://youtu.be/-9-HZKK2ccI[Getting started with Apache APISIX Dashboard].
+TIP: You can also watch you a video tutorial on YouTube https://youtu.be/-9-HZKK2ccI[Getting started with Apache APISIX Dashboard^].
 You can learn how to use the APISIX dashboard platform to manage your Admin API from a single simple user interface.
 Also, how to install Apache APISIX with Docker, how you can create a route, upstream and add authentication to your first Consumer service using the same Dashboard.
 The same steps we do here.
@@ -258,16 +258,16 @@ So far we have shown how you can use the power of Apache APISIX  to deploy confi
 Apache APISIX API Gateway acts as a single entry point and offers
 many authentication plugins including:
 
-* https://apisix.apache.org/docs/apisix/plugins/basic-auth[HTTP Basic Auth]
-* https://apisix.apache.org/docs/apisix/plugins/key-auth[API Keys based Auth]
-* https://apisix.apache.org/docs/apisix/plugins/openid-connect[OpenID Connect]
-* https://apisix.apache.org/docs/apisix/plugins/hmac-auth[HMAC Auth]
-* https://apisix.apache.org/docs/apisix/plugins/ldap-auth[Ldap Authentication]
+* https://apisix.apache.org/docs/apisix/plugins/basic-auth[HTTP Basic Auth^]
+* https://apisix.apache.org/docs/apisix/plugins/key-auth[API Keys based Auth^]
+* https://apisix.apache.org/docs/apisix/plugins/openid-connect[OpenID Connect^]
+* https://apisix.apache.org/docs/apisix/plugins/hmac-auth[HMAC Auth^]
+* https://apisix.apache.org/docs/apisix/plugins/ldap-auth[Ldap Authentication^]
 * And more.
 
-https://apisix.apache.org/docs/apisix/plugins/jwt-auth[JWT (JSON Web Token) plugin] is one strategy for API gateway authentication.
+https://apisix.apache.org/docs/apisix/plugins/jwt-auth[JWT (JSON Web Token) plugin^] is one strategy for API gateway authentication.
 JWT simplifies authentication setup, allowing you to focus more on coding and less on security.
-Refer to https://jwt.io/[JWT] for more information.
+Refer to https://jwt.io/[JWT^] for more information.
 
 ====
 https://apisix.apache.org/docs/apisix/plugins/jwt-auth[Apache APISIX JWT Plugin] acts as an issuer and also validates the token on behalf of your API, so a developer does not have to add any code in your API to process the authentication.
@@ -322,7 +322,7 @@ image::jwt-enable-plugin-route-screenshot.png[]
 
 Now we enabled JWT plugin, it is time to validate it.
 
-TIP: jwt-auth uses the HS256 algorithm by default, and if you use the RS256 algorithm, you need to specify the algorithm and configure the public key and private key, as it is described https://apisix.apache.org/docs/apisix/plugins/jwt-auth#:~:text=jwt%2Dauth%20uses%20the%20HS256%20algorithm[here].
+TIP: jwt-auth uses the HS256 algorithm by default, and if you use the RS256 algorithm, you need to specify the algorithm and configure the public key and private key, as it is described https://apisix.apache.org/docs/apisix/plugins/jwt-auth#:~:text=jwt%2Dauth%20uses%20the%20HS256%20algorithm[here^].
 
 Run the following curl cmd to generate new JWT token:
 
@@ -368,7 +368,7 @@ In our modern era, API security has become increasingly important.
 There are many API security best practices such as making use of TLS encryption, setting API Firewalls, validating request data, throttling for protection, continuously monitoring, auditing, logging or a dedicated API Gateway deployment where you can secure the API traffic from beginning to end.
 
 ====
-Also, https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Apache APISIX IP Restrictions Plugin] can be enabled for security reasons, wherein, the users will be allowed to login only from a range of IP addresses as defined by the system or administrators.
+Also, https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Apache APISIX IP Restrictions Plugin^] can be enabled for security reasons, wherein, the users will be allowed to login only from a range of IP addresses as defined by the system or administrators.
 If the user tries to log in outside the allowed range, the system throws an error, and login will not be possible.
 ====
 
@@ -438,7 +438,7 @@ With the help of API Gateway, you can set automatic retries, timeouts, circuit b
 Rate limiting is a strategy for limiting network traffic. It puts a cap on how often someone can repeat an action within a certain timeframe – for instance, trying to log into an account.
 
 ====
-https://apisix.apache.org/docs/apisix/plugins/limit-count/[Limit count plugin] is one type of request limiting plugins. It limits request-rate
+https://apisix.apache.org/docs/apisix/plugins/limit-count/[Limit count plugin^] is one type of request limiting plugins. It limits request-rate
 by a fixed number of requests in a given time window. It means how many HTTP requests
 can be made in a given period of seconds, minutes, hours, days, months, or years.
 ====
