@@ -166,25 +166,25 @@ The same steps we do here.
 
 In the above steps, we created a new route, upstream and mapped the route to the upstream.
 
-====
-The same configuration we did via command-line interface can be achieved with the Dashboard.
-====
+NOTE: The same configuration we did via command-line interface can be achieved with the Dashboard.
 
 .Here are some of the things you can do with APISIX Dashboard:
 
 * Create new Routes, Upstreams and Consumers.
 * Activate or deactivate plugins with a couple of clicks.
 
-WARNING: The route we created is public.
+[WARNING]
+====
+The route we created is public.
 Thus, anyone can access this Upstream service as long as they know the address that Apache APISIX exposes to the outside world.
 This is unsafe, it creates certain security risks.
 In a practical application scenario, we need to add authentication to the route.
+====
 
 Apache APISIX dashboard is running on the address http://localhost:9000/ if you click and try to open the Apache APISIX dashboard you can see the dashboard is running
 
-====
 You can log into the dashboard by using *login* as _admin_ and *password* as an _admin_.
-====
+
 image::login-dashboard-screenshot.png[]
 
 After you logged in, go to Route page in the navigation bar on the left side.
@@ -217,9 +217,8 @@ So now as you can see we have example consumer.
 
 image::example-consumer-created-screenshot.png[]
 
-====
-By adding key authentication we are controlling the data that is allowed to be transmitted from our gateways and identifying unique consumers that are accessing our API now that the plugin is activated and any requests that do not include a valid API key will be automatically rejected with HTTP 401 status.
-====
+TIP: By adding key authentication we are controlling the data that is allowed to be transmitted from our gateways and identifying unique consumers that are accessing our API now that the plugin is activated and any requests that do not include a valid API key will be automatically rejected with HTTP 401 status.
+
 To show this let's move over to our terminal.
 
 === Enable key-auth plugin
@@ -269,9 +268,7 @@ https://apisix.apache.org/docs/apisix/plugins/jwt-auth[JWT (JSON Web Token) plug
 JWT simplifies authentication setup, allowing you to focus more on coding and less on security.
 Refer to https://jwt.io/[JWT^] for more information.
 
-====
-https://apisix.apache.org/docs/apisix/plugins/jwt-auth[Apache APISIX JWT Plugin] acts as an issuer and also validates the token on behalf of your API, so a developer does not have to add any code in your API to process the authentication.
-====
+NOTE: https://apisix.apache.org/docs/apisix/plugins/jwt-auth[Apache APISIX JWT Plugin] acts as an issuer and also validates the token on behalf of your API, so a developer does not have to add any code in your API to process the authentication.
 
 IMPORTANT: Your should disable key-auth plugin we enabled for _example-consumer_ via dashboard in order to use another auth plugin.
 You can disable it via Dashboard or command line.
@@ -367,6 +364,7 @@ API security refers to the practice of preventing or mitigating attacks on APIs.
 In our modern era, API security has become increasingly important.
 There are many API security best practices such as making use of TLS encryption, setting API Firewalls, validating request data, throttling for protection, continuously monitoring, auditing, logging or a dedicated API Gateway deployment where you can secure the API traffic from beginning to end.
 
+[NOTE]
 ====
 Also, https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Apache APISIX IP Restrictions Plugin^] can be enabled for security reasons, wherein, the users will be allowed to login only from a range of IP addresses as defined by the system or administrators.
 If the user tries to log in outside the allowed range, the system throws an error, and login will not be possible.
@@ -437,6 +435,7 @@ And, after you have a better sense of your system’s activities, you’ll have 
 With the help of API Gateway, you can set automatic retries, timeouts, circuit breakers or rate limiting.
 Rate limiting is a strategy for limiting network traffic. It puts a cap on how often someone can repeat an action within a certain timeframe – for instance, trying to log into an account.
 
+[NOTE]
 ====
 https://apisix.apache.org/docs/apisix/plugins/limit-count/[Limit count plugin^] is one type of request limiting plugins.
 It limits request-rate by a fixed number of requests in a given time window.
@@ -479,7 +478,9 @@ But when you visit for the third time, you will receive a response with the 503 
 
 image::limit-count-plugin-enable-access-failed-screenshot.png[]
 
-TIP: If you set the property _rejected_msg_ in your request to custom message, for example, "_Requests are too frequent, please try again later._", when you visit for the third time, you will receive a response body like below:
+[TIP]
+====
+If you set the property _rejected_msg_ in your request to custom message, for example, "_Requests are too frequent, please try again later._", when you visit for the third time, you will receive a response body like below:
 
 ----
 HTTP/1.1 503 Service Temporarily Unavailable
@@ -490,7 +491,11 @@ Server: APISIX web server
 
 {"error_msg":"Requests are too frequent, please try again later."}
 ----
+====
 
-TIP: You also can complete the above operation through the web interface, first add a route, then add limit-count plugin:
+[TIP]
+====
+You also can complete the above operation through the web interface, first add a route, then add limit-count plugin:
 
 image::limit-count-plugin-enable-with-dashboard-screenshot.png[]
+====
