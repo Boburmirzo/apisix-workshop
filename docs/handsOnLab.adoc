@@ -3,6 +3,7 @@ Bobur Umurzokov <boburmirzo.umurzokov@gmail.com>
 
 :toc:
 :icons: font
+:experimental: true
 
 == Welcome
 
@@ -19,11 +20,11 @@ In this session, we will use https://apisix.apache.org/docs/apisix/how-to-build[
 
 == Concepts
 
-Some core concepts should be learned before you create some configurations to let Apache APISIX work as per your needs.
+We should learn a couple of core concepts before Apache APISIX work as per our needs.
 
-1. https://apisix.apache.org/docs/apisix/architecture-design/route/[Route^] is the most important concept in Apache APISIX, it guides APISIX to forward traffic to the correct backends.
-2. https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream^] is the view of backend microservices from APISIX point of view.
-3. https://apisix.apache.org/docs/apisix/architecture-design/plugin/[Plugin^] is a mechanism to manage traffic ( authentication, authorization, and so on) on the APISIX side.
+. https://apisix.apache.org/docs/apisix/architecture-design/route/[Route^] is the most critical concept in Apache APISIX; it instructs APISIX how to forward traffic to the correct upstream.
+. https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream^] is the view of backend microservices from Apache APISIX point of view.
+. https://apisix.apache.org/docs/apisix/architecture-design/plugin/[Plugin^] is a mechanism to manage traffic (authentication, authorization, and so on) on the APISIX side.
 
 == Pre-requisites
 
@@ -33,7 +34,7 @@ You can also use other tools such as Postman for testing.
 
 == Install Apache APISIX
 
-Download the Docker image of Apache APISIXgit clone.
+Download the Docker image of Apache APISIX.
 
 [source,bash^]
 ----
@@ -56,7 +57,6 @@ docker-compose -p docker-apisix up -d
 
 Once the download is complete, execute the curl command on the host running Docker to access the Admin API, and determine if Apache APISIX was successfully started based on the returned data.
 
-
 Please execute the curl command on the host where you are running
 Docker.
 
@@ -72,8 +72,8 @@ Route.
 
 === How it works
 
-We can create a https://apisix.apache.org/docs/apisix/architecture-design/route/[Route^] and connect it to an https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream^] service(also known as the Upstream).
-When a Request arrives at Apache APISIX, Apache APISIX knows which Upstream the request should be forwarded to.
+We can create a https://apisix.apache.org/docs/apisix/architecture-design/route/[Route^] and connect it to an https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream^].
+When Apache APISIX receives a request, it computes which Upstream it should forward it.
 
 === Route Configuration
 
@@ -95,19 +95,20 @@ curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f
 }'
 ----
 
-Once this route is created, we can access the Upstream service using the address exposed by Apache APISIX.
+Once we have created the Route, we can access the Upstream through the Apache APISIX.
 
 [source,bash]
 ----
 curl -i -X GET "http://127.0.0.1:9080/anything/foo?arg=10" -H "Host: example.com"
 ----
 
-This will be forwarded to http://httpbin.org:80/anything/foo?arg=10 by
-Apache APISIX.
+Apache APISIX will forward the request to http://httpbin.org:80/anything/foo?arg=10.
 
 == Create an Upstream
 
-An Upstream can be created by simply executing the following command:
+Apache APISIX API is consistent.
+The Upstream API is similar to the Route's.
+We can create an Upstream by executing the following command:
 
 [source,bash]
 ----
@@ -120,14 +121,10 @@ curl "http://127.0.0.1:9080/apisix/admin/upstreams/1" -H "X-API-KEY: edd1c9f0343
 }'
 ----
 
-
-NOTE: Creating an Upstream service is not actually necessary, as we can use https://apisix.apache.org/docs/apisix/architecture-design/plugin/[Plugin^] to intercept the request and then respond directly.
-However, for the purposes of this guide, we assume that at least one Upstream service needs to be set up.
-
-
 == Bind the Route to the Upstream
 
-In the above step, we created an Upstream service (referencing our backend service), now let’s bind a Route for it.
+In the above section, we created an Upstream (referencing our backend);
+now, let's bind a Route for it.
 
 [source,bash]
 ----
@@ -141,142 +138,142 @@ curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f
 
 === Validation
 
-We have created the route and the Upstream service and bound them.
-Now let’s access Apache APISIX to test this route.
+At this point, we have created a Route and an Upstream and bound them together.
+Now is time to test our configuration.
 
 [source,bash]
 ----
 curl -i -X GET "http://127.0.0.1:9080/get?foo1=bar1&foo2=bar2" -H "Host: httpbin.org"
 ----
 
-It returns data from our Upstream service (actually httpbin.org) and the result is as expected.
+It should return the expected data from the configured Upstream.
 
 == APISIX Dashboard
 
-_Apache APISIX_ provides a https://github.com/apache/apisix-dashboard[Dashboard^] to make our operation more intuitive and easier on UI.
+Apache APISIX provides a https://github.com/apache/apisix-dashboard[Dashboard^] to make operating it more intuitive and more accessible.
 
-More information about APISIX Dashboard can be found https://apisix.apache.org/docs/dashboard/USER_GUIDE[here^].
+You can find more information about APISIX Dashboard in the https://apisix.apache.org/docs/dashboard/USER_GUIDE[user guide^].
 
-TIP: You can also watch you a video tutorial on YouTube https://youtu.be/-9-HZKK2ccI[Getting started with Apache APISIX Dashboard^].
-You can learn how to use the APISIX dashboard platform to manage your Admin API from a single simple user interface.
-Also, how to install Apache APISIX with Docker, how you can create a route, upstream and add authentication to your first Consumer service using the same Dashboard.
-The same steps we do here.
+[TIP]
+====
+A https://youtu.be/-9-HZKK2ccI[Getting started with Apache APISIX Dashboard^] video tutorial is available.
+It demos the same features we achieve here via the +++<abbr title="Command-Line Interface">CLI</abbr>+++.
+====
 
 === Add a new Consumer
 
-In the above steps, we created a new route, upstream and mapped the route to the upstream.
+We created a new Route, Upstream, and mapped the former to the latter in the above steps.
 
-NOTE: The same configuration we did via command-line interface can be achieved with the Dashboard.
-
-.Here are some of the things you can do with APISIX Dashboard:
-
-* Create new Routes, Upstreams and Consumers.
-* Activate or deactivate plugins with a couple of clicks.
-
-[WARNING]
+[NOTE]
 ====
-The route we created is public.
-Thus, anyone can access this Upstream service as long as they know the address that Apache APISIX exposes to the outside world.
-This is unsafe, it creates certain security risks.
-In a practical application scenario, we need to add authentication to the route.
+We can achieve the same configuration result with the +++<abbr title="Command-Line Interface">CLI</abbr>+++ as with the Dashboard.
+Indeed, the Dashboard sends HTTP requests to Apache APISIX.
 ====
 
-Apache APISIX dashboard is running on the address http://localhost:9000/ if you click and try to open the Apache APISIX dashboard you can see the dashboard is running
+The Route we have created is public.
+Thus, anyone can access the underlying Upstream as long as they know the endpoint Apache APISIX exposes to the outside world.
+It's not safe as a malicious actor could use this endpoint.
+For this reason, we are going to add authentication to the Route.
 
-You can log into the dashboard by using *login* as _admin_ and *password* as an _admin_.
+Apache APISIX dashboard is running on the address http://localhost:9000/.
+You can navigate to this address and see the Dashboard running.
+
+The default credentials are `admin`/`admin`.
 
 [.text-center]
 image::login-dashboard-screenshot.png[]
 
-After you logged in, go to Route page in the navigation bar on the left side.
+After logging, go to btn:[Route] in the navigation bar on the left side.
 
-As you can see in the below image, there is a route in the Route list that we created previously with curl commands.
+In the Route list, we can see the Route we created previously with `curl`.
 
 image::route-list-screenshot.png[]
 
-Next, open Upstream page by navigating to Upstream option on the same bar.
-
-Similarly, in the list of Upstreams, our example upstream is appeared.
+Next, navigate to btn:[Upstream].
+Likewise, the Dashboard displays our sample Upstream.
 
 image::upstream-list-screenshot.png[]
 
-So let's create our first consumer I will press a button to create and give a consumer name in this case we can call it _Example Consumer_ so click next
+Click on btn:[Create], and give the Consumer a name, e.g., `Example Consumer`.
+Click btn:[Next].
 
 image::create-new-consumer-screenshot.png[]
 
 image::consumer-detail-screenshot.png[]
 
-And we will apply for this consumer the key auth, a key authentication and we need to enable from various plugins options I will choose authentication.
+=== Enable key-auth plugin
+
+For this Consumer, we will apply a key authentication.
+Among the many plugins available, let's choose `key auth`.
 
 image::key-auth-plugin-enable-screenshot.png[]
 
-Go to the Plugin Editor in order to enable this plugin I need to press enable button and click this toggle switch on then I will just provide a key for the consumer like a key for example key of john and submit click next and submit.
+Click btn:[Enable] and push the toggle switch on.
+Then, provide a key for the Consumer, _e.g._, `john`.
+btn:[Submit], click btn:[Next] and btn:[Submit] again.
 
 image::plugin-config-example-screenshot.png[]
 
-So now as you can see we have example consumer.
+At this point, we should have a ready-to-use Consumer.
 
 image::example-consumer-created-screenshot.png[]
 
-TIP: By adding key authentication we are controlling the data that is allowed to be transmitted from our gateways and identifying unique consumers that are accessing our API now that the plugin is activated and any requests that do not include a valid API key will be automatically rejected with HTTP 401 status.
+We control the data allowed to transit via the gateway by adding authentication.
+We can identify *unique* Consumers accessing our API.
+Any request that does not include a valid API key will be rejected with an HTTP `401` status.
 
-To show this let's move over to our terminal.
-
-=== Enable key-auth plugin
-
-To test this we can simply run following command:
+To prove it, let's move back to the terminal.
 
 [source,bash]
 ----
 curl -i -X GET "http://127.0.0.1:9080/anything/foo?arg=10" -H "Host: example.com"
 ----
 
-We want to access with GET HTTP method with specified parameters the endpoint.
-
-
-We will obviously get an unauthorized error now it's our API is secured, and we are missing API key
+Because we didn't set the authentication key, Apache APISIX will return an unauthorized error.
 
 image::http-unauthorized-error-screenshot.png[]
 
-And what we can do we need to send the API key.
-So let's add to the end of my request API key of _Example Consumer_ and press enter.
+We can retry the same request with the authentication key.
 
 [source,bash]
 ----
 curl -i -X GET http://127.0.0.1:9080/get -H "Host: httpbin.org" -H "apikey: key-of-john"
 ----
 
-Now as you can see I can access my API endpoint.
+We can now successfully access the endpoint!
 
 image::access-endpoint-with-consumer.png[]
 
-So far we have shown how you can use the power of Apache APISIX  to deploy configure and publish your API and secure it as well all from a single user interface currently the dashboard.
+This section shows how to use Apache APISIX to deploy, configure, and securely publish APIs from the Dashboard.
 
 == Plugins Usage
 
 === JWT Plugin
-Apache APISIX API Gateway acts as a single entry point and offers
-many authentication plugins including:
+
+Apache APISIX API Gateway acts as a single entry point and offers many authentication plugins, including:
 
 * https://apisix.apache.org/docs/apisix/plugins/basic-auth[HTTP Basic Auth^]
 * https://apisix.apache.org/docs/apisix/plugins/key-auth[API Keys based Auth^]
 * https://apisix.apache.org/docs/apisix/plugins/openid-connect[OpenID Connect^]
 * https://apisix.apache.org/docs/apisix/plugins/hmac-auth[HMAC Auth^]
 * https://apisix.apache.org/docs/apisix/plugins/ldap-auth[Ldap Authentication^]
-* And more.
+* etc.
 
-https://apisix.apache.org/docs/apisix/plugins/jwt-auth[JWT (JSON Web Token) plugin^] is one strategy for API gateway authentication.
-JWT simplifies authentication setup, allowing you to focus more on coding and less on security.
-Refer to https://jwt.io/[JWT^] for more information.
+The https://apisix.apache.org/docs/apisix/plugins/jwt-auth[JWT (JSON Web Token) plugin^] is another solid option for API gateway authentication.
+JWT simplifies authentication setup, taking care of the nitty-gritty details.
+Please refer to https://jwt.io/[JWT^] for more information.
 
-NOTE: https://apisix.apache.org/docs/apisix/plugins/jwt-auth[Apache APISIX JWT Plugin] acts as an issuer and also validates the token on behalf of your API, so a developer does not have to add any code in your API to process the authentication.
+The https://apisix.apache.org/docs/apisix/plugins/jwt-auth[Apache APISIX JWT Plugin] acts as an issuer and also validates the token on behalf of the API.
+It means that developers do not have to add any code to process the authentication.
 
-IMPORTANT: Your should disable key-auth plugin we enabled for _example-consumer_ via dashboard in order to use another auth plugin.
-You can disable it via Dashboard or command line.
+[IMPORTANT]
+====
+We need to disable the `key-auth` plugin we previously enabled to use another authentication plugin.
+Disabling is possible via the Dashboard or the CLI.
+====
 
-Let's apply to our existing API JWT Auth plugin.
-
-Set to our existing _example_consumer_ plugin config the value of the jwt-auth as an option:
+Let's apply the JWT plugin to our existing API.
+We update the existing `Consumer` plugin config with JWT-related configuration:
 
 [source,bash]
 ----
@@ -292,11 +289,11 @@ curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f1
 }'
 ----
 
-In the console, you will get a response likely below:
+The response will look something like this:
 
 image::jwt-add-consumer-screenshot.png[]
 
-For the exising _Example route_ we created previously, enable jwt-auth plugin too:
+We can now add the `jwt-auth` plugin to the Route we have created previously:
 
 [source,bash]
 ----
@@ -312,28 +309,31 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 }'
 ----
 
-Output:
-
 image::jwt-enable-plugin-route-screenshot.png[]
 
 ==== Test Plugin
 
-Now we enabled JWT plugin, it is time to validate it.
+We want to validate that the setup is correct as we did before.
 
-TIP: jwt-auth uses the HS256 algorithm by default, and if you use the RS256 algorithm, you need to specify the algorithm and configure the public key and private key, as it is described https://apisix.apache.org/docs/apisix/plugins/jwt-auth#:~:text=jwt%2Dauth%20uses%20the%20HS256%20algorithm[here^].
+[TIP]
+====
+`jwt-auth` uses the HS256 algorithm by default.
+If you use the RS256 algorithm, you must specify the algorithm and configure the public and private keys.
+Please check the https://apisix.apache.org/docs/apisix/plugins/jwt-auth#:~:text=jwt%2Dauth%20uses%20the%20HS256%20algorithm[documentation^] for more details.
+====
 
-Run the following curl cmd to generate new JWT token:
+Run the following command to generate a new JWT token:
 
 [source,bash]
 ----
 curl http://127.0.0.1:9080/apisix/plugin/jwt/sign?key=user-key -i
 ----
 
-Token is generated:
+Apache APISIX returns a token:
 
 image::jwt-token-generated-screenshot.png[]
 
-Set generated token to your GET request:
+We can use the newly-generated token to authenticate our next request:
 
 [source,bash]
 ----
@@ -344,10 +344,7 @@ Output with token:
 
 image::access-endpoint-with-generated-token.png[]
 
-Obviously, if you try to access the same endpoint without token provided in the Header request, you will get HTTP Error _401 Unauthorized_
-
-Try it yourself:
-
+If you try to access the same endpoint without a token in the Header request, you will get HTTP Error _401 Unauthorized:
 [source,bash]
 ----
 curl -i -X GET http://127.0.0.1:9080/get
@@ -357,21 +354,28 @@ Output without token:
 
 image::access-without-jwt-token-screenshot.png[]
 
-As we tested, we can validate the identity of the client attempting to make a connection by using various authentication plugins with the help of Apache APISIX.
+We have validated the client's identity attempting to request by using various authentication plugins with the help of Apache APISIX.
 
 === IP Restriction Plugin
 
-API security refers to the practice of preventing or mitigating attacks on APIs.
 In our modern era, API security has become increasingly important.
-There are many API security best practices such as making use of TLS encryption, setting API Firewalls, validating request data, throttling for protection, continuously monitoring, auditing, logging or a dedicated API Gateway deployment where you can secure the API traffic from beginning to end.
+Many hardening techniques are available:
 
-[NOTE]
-====
-Also, https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Apache APISIX IP Restrictions Plugin^] can be enabled for security reasons, wherein, the users will be allowed to login only from a range of IP addresses as defined by the system or administrators.
-If the user tries to log in outside the allowed range, the system throws an error, and login will not be possible.
-====
+* TLS encryption
+* API Firewalls
+* Validating request data
+* Throttling for protection
+* Continuously monitoring
+* Auditing
+* Logging
 
-Let's enable `ip-restriction` plugin for our existing _example route_.
+An API Gateway can handle all those cross-cutting concerns.
+
+Another technique is to limit the IPs of clients that can send requests.
+The https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Apache APISIX IP Restrictions Plugin^] implements this technique.
+If the user tries to send a request from an IP that is not valid, Apache APISIX will meet them with an error.
+
+Let's enable `ip-restriction` plugin for our existing _Example route_.
 
 [source,bash]
 ----
@@ -390,12 +394,11 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 }'
 ----
 
-
 Output:
 
 image::ip-restrictions-enable-plugin-screenshot.png[]
 
-Now we enabled IP restriction by whitelisting only certain IP addresses, and other requests from different IP addresses will be rejected simply.
+With IP restrictions that allow only specific IP addresses, requests from IP addresses outside of the list are rejected.
 
 [source,bash]
 ----
@@ -406,13 +409,18 @@ Output:
 
 image::ip-restrictions-plugin-test-result-screenshot.png[]
 
-TIP: Default returns `{"message":"Your IP address is not allowed"}` when unallowed IP access. If you want to use a custom message, you can configure it in the plugin section.
+We can not access the API with IPs other than the allowed ones.
 
-As you can see from the output, we can not access our API with IPs other than whitelisted ones.
+[TIP]
+====
+By default, the plugin returns a generic `{"message":"Your IP address is not allowed"}` if the IP is not allowed.
+It's possible to configure a more friendly message via the plugin.
+====
 
-Similarly, with the plugin, you can also add IP addresses to blacklist by changing the previous request.
+In addition, the plugin also provides the ability to disallow IP address ranges.
 
-When you want to disable the ip-restriction plugin (Another plugin), it is very simple, you can delete the corresponding json configuration from the plugin configuration, no need to restart the service (Since Apache APISIX Plugin supports hot reloading), it will take effect immediately:
+When wanting to disable a plugin, we can delete the corresponding JSON configuration from the plugin configuration.
+*Apache APISIX supports hot reloading*; there's no need to restart the service!
 
 [source,bash]
 ----
@@ -430,20 +438,18 @@ image::ip-restrictions-plugin-test-result-disabled-screenshot.png[]
 
 === Limit Count Plugin
 
-API traffic management can improve the overall visibility of your system and allow you to better understand just what is going on throughout your organization.
-And, after you have a better sense of your system’s activities, you’ll have an opportunity to use that information to solve problems directly.
+API traffic management can improve the overall visibility of one's system and better understand the state of the traffic throughout one's organization.
+A better understanding of the undergoing activities provides many opportunities to solve problems.
 
-With the help of API Gateway, you can set automatic retries, timeouts, circuit breakers or rate limiting.
-Rate limiting is a strategy for limiting network traffic. It puts a cap on how often someone can repeat an action within a certain timeframe – for instance, trying to log into an account.
+With the help of an API Gateway, one can set automatic retries, timeouts, circuit breakers, or rate-limiting.
+Rate limiting is a strategy for limiting network traffic. It puts a cap on how often someone can repeat an action within a specific timeframe – for instance, trying to log into an account.
 
-[NOTE]
-====
-https://apisix.apache.org/docs/apisix/plugins/limit-count/[Limit count plugin^] is one type of request limiting plugins.
-It limits request-rate by a fixed number of requests in a given time window.
-It means how many HTTP requests can be made in a given period of seconds, minutes, hours, days, months, or years.
-====
+The https://apisix.apache.org/docs/apisix/plugins/limit-count/[Limit count plugin^] is one among many limiting plugins.
+It limits the request rate by a fixed number of requests in a given time window:
+how many HTTP requests one can make in a given period of seconds, minutes, hours, days, months, or years.
 
-Let's enable `limit-count` plugin on the specified route before. To do so, please run the following cmd:
+Let's enable the `limit-count` plugin on our existing Route.
+To do so, run the following command:
 
 [source,bash]
 ----
@@ -467,21 +473,21 @@ Output:
 
 image::limit-count-plugin-enable-screenshot.png[]
 
-The above configuration limits access to only 2 times in 60 seconds.
-The first two visits will be normally accepted. Let's see:
+The above configuration limits the number of requests to two in 60 seconds.
+Apache APISIX will handle the first two requests as usual:
 
 [source,bash]
 ----
 curl -i http://127.0.0.1:9080/get
 ----
 
-But when you visit for the third time, you will receive a response with the 503 HTTP code:
+A third request in the same period will return a 503 HTTP code:
 
 image::limit-count-plugin-enable-access-failed-screenshot.png[]
 
-[TIP]
-====
-If you set the property _rejected_msg_ in your request to custom message, for example, "_Requests are too frequent, please try again later._", when you visit for the third time, you will receive a response body like below:
+You can configure the failure message with the `rejected_msg` attribute.
+For example, we can set it with `Requests are too frequent, please try again later`.
+After reaching the threshold, the response is akin to the following:
 
 ----
 HTTP/1.1 503 Service Temporarily Unavailable
@@ -492,11 +498,10 @@ Server: APISIX web server
 
 {"error_msg":"Requests are too frequent, please try again later."}
 ----
-====
 
-[TIP]
+[INFO]
 ====
-You also can complete the above operation through the web interface, first add a route, then add limit-count plugin:
+As usual, You also can complete the above operation through the web interface, first add a route, then add the `limit-count` plugin:
 
 image::limit-count-plugin-enable-with-dashboard-screenshot.png[]
 ====
