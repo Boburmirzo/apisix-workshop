@@ -172,8 +172,8 @@ The same configuration we did via command-line interface can be achieved with th
 
 .Here are some of the things you can do with APISIX Dashboard:
 
-- Create new Routes, Upstreams and Consumers.
-- Activate or deactivate plugins with a couple of clicks.
+* Create new Routes, Upstreams and Consumers.
+* Activate or deactivate plugins with a couple of clicks.
 
 WARNING: The route we created is public.
 Thus, anyone can access this Upstream service as long as they know the address that Apache APISIX exposes to the outside world.
