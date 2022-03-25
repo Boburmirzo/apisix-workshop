@@ -262,8 +262,11 @@ The https://apisix.apache.org/docs/apisix/plugins/jwt-auth[JWT (JSON Web Token) 
 JWT simplifies authentication setup, taking care of the nitty-gritty details.
 Please refer to https://jwt.io/[JWT^] for more information.
 
+[INFO]
+====
 The https://apisix.apache.org/docs/apisix/plugins/jwt-auth[Apache APISIX JWT Plugin] acts as an issuer and also validates the token on behalf of the API.
 It means that developers do not have to add any code to process the authentication.
+====
 
 [IMPORTANT]
 ====
@@ -353,7 +356,7 @@ Output without token:
 
 image::access-without-jwt-token-screenshot.png[]
 
-We have validated the client's identity attempting to request by using various authentication plugins with the help of Apache APISIX.
+We have validated the client's identity attempting to request by using various https://apisix.apache.org/docs/apisix/plugins/key-auth[authentication plugins] with the help of Apache APISIX.
 
 === IP Restriction Plugin
 
@@ -370,9 +373,12 @@ Many hardening techniques are available:
 
 An API Gateway can handle all those cross-cutting concerns.
 
+[INFO]
+====
 Another technique is to limit the IPs of clients that can send requests.
 The https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Apache APISIX IP Restrictions Plugin^] implements this technique.
 If the user tries to send a request from an IP that is not valid, Apache APISIX will meet them with an error.
+====
 
 Let's enable `ip-restriction` plugin for our existing _Example route_.
 
@@ -443,9 +449,12 @@ A better understanding of the undergoing activities provides many opportunities 
 With the help of an API Gateway, one can set automatic retries, timeouts, circuit breakers, or rate-limiting.
 Rate limiting is a strategy for limiting network traffic. It puts a cap on how often someone can repeat an action within a specific timeframe – for instance, trying to log into an account.
 
+[INFO]
+====
 The https://apisix.apache.org/docs/apisix/plugins/limit-count/[Limit count plugin^] is one among many limiting plugins.
 It limits the request rate by a fixed number of requests in a given time window:
 how many HTTP requests one can make in a given period of seconds, minutes, hours, days, months, or years.
+====
 
 Let's enable the `limit-count` plugin on our existing Route.
 To do so, run the following command:
@@ -503,4 +512,90 @@ Server: APISIX web server
 As usual, You also can complete the above operation through the web interface, first add a route, then add the `limit-count` plugin:
 
 image::limit-count-plugin-enable-with-dashboard-screenshot.png[]
+
 ====
+
+=== HTTP Logger Plugin
+
+API observability is the ability to understand system behavior and investigate the interactions between an application's components. It provides for your API tracers, metrics and loggers.
+
+An API event is logged each time an API operation is invoked and for each API event. You can gain analytic insights into your API activities or debug your APIs through the logged data
+
+[INFO]
+====
+For instance, https://apisix.apache.org/docs/apisix/plugins/http-logger/#how-to-enable[HTTP logger Plugin^]
+pushes Log data requests to HTTP/HTTPS servers or sends as JSON objects to Monitoring tools.
+====
+
+The following is an example of how to enable the http-logger for our specific route.
+You could generate a mock HTTP server at http://mockbin.org/bin/create[mockbin^] to view the logs.
+
+[source,bash]
+----
+curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+      "plugins": {
+            "http-logger": {
+                "uri": "http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61"
+            }
+       },
+      "upstream_id": "1",
+      "uri": "/get"
+}'
+----
+
+You will get the following response:
+
+[source,json]
+----
+{
+  "node": {
+    "value": {
+      "update_time": 1648189729,
+      "uri": "/get",
+      "create_time": 1646341656,
+      "status": 1,
+      "priority": 0,
+      "upstream_id": "1",
+      "plugins": {
+        "http-logger": {
+          "include_resp_body": false,
+          "timeout": 3,
+          "include_req_body": false,
+          "concat_method": "json",
+          "name": "http logger",
+          "auth_header": "",
+          "uri": "http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61",
+          "batch_max_size": 1000,
+          "max_retry_count": 0,
+          "retry_delay": 1,
+          "buffer_duration": 60,
+          "inactive_timeout": 5
+        }
+      },
+      "id": "1"
+    },
+    "key": "/apisix/routes/1"
+  },
+  "action": "set"
+}
+
+----
+
+We can send a request to this get endpoint to generate logs.
+
+[source,bash]
+----
+curl -i http://127.0.0.1:9080/get
+----
+
+As you can see, some recent logs are sent to our mock server:
+
+image::http-logger-plugin-test-screenshot.png[]
+
+[INFO]
+====
+You can find information about other Apache APISIX Observability
+Plugins https://apisix.apache.org/docs/apisix/plugins/zipkin[here^].
+====
+
