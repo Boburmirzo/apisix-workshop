@@ -36,21 +36,24 @@ testing. You can also use other tools such as Postman for testing.
 
 Download the Docker image of Apache APISIXgit clone.
 
-....
+[source,bash]
+----
 git clone https://github.com/apache/apisix-docker.git
-....
+----
 
 Switch the current directory to the apisix-docker/example path.
 
-....
+[source,bash]
+----
 cd apisix-docker/example
-....
+----
 
 Run the docker-compose command to install Apache APISIX.
 
-....
+[source,bash]
+----
 docker-compose -p docker-apisix up -d
-....
+----
 
 Once the download is complete, execute the curl command on the host
 running Docker to access the Admin API, and determine if Apache APISIX
@@ -60,9 +63,10 @@ was successfully started based on the returned data.
 Please execute the curl command on the host where you are running
 Docker.
 
-....
+[source,bash]
+----
 curl "http://127.0.0.1:9080/apisix/admin/services/" -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1'
-....
+----
 
 == Create a Route
 
@@ -83,7 +87,7 @@ forwarded to.
 
 The following curl command creates a sample configuration of Route:
 
-[source,text]
+[source,bash]
 ----
 curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f136f87ad84b625c8f1" -X PUT -d '
 {
@@ -102,9 +106,10 @@ curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f
 Once this route is created, we can access the Upstream service using the
 address exposed by Apache APISIX.
 
-....
+[source,bash]
+----
 curl -i -X GET "http://127.0.0.1:9080/anything/foo?arg=10" -H "Host: example.com"
-....
+----
 
 This will be forwarded to http://httpbin.org:80/anything/foo?arg=10 by
 Apache APISIX.
@@ -113,8 +118,8 @@ Apache APISIX.
 
 An Upstream can be created by simply executing the following command:
 
-[source,text]
-....
+[source,bash]
+----
 curl "http://127.0.0.1:9080/apisix/admin/upstreams/1" -H "X-API-KEY: edd1c9f034335f136f87ad84b625c8f1" -X PUT -d '
 {
   "type": "roundrobin",
@@ -122,7 +127,7 @@ curl "http://127.0.0.1:9080/apisix/admin/upstreams/1" -H "X-API-KEY: edd1c9f0343
     "httpbin.org:80": 1
   }
 }'
-....
+----
 
 
 NOTE: Creating an Upstream service is not actually necessary, as we can
@@ -138,25 +143,25 @@ needs to be set up.
 In the above step, we created an Upstream service (referencing our
 backend service), now let’s bind a Route for it.
 
-[source,text]
-....
+[source,bash]
+----
 curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f136f87ad84b625c8f1" -X PUT -d '
 {
   "uri": "/get",
   "host": "httpbin.org",
   "upstream_id": "1"
 }'
-....
+----
 
 === Validation
 
 We have created the route and the Upstream service and bound them. Now
 let’s access Apache APISIX to test this route.
 
-[source,shell script]
-....
-  curl -i -X GET "http://127.0.0.1:9080/get?foo1=bar1&foo2=bar2" -H "Host: httpbin.org"
-....
+[source,bash]
+----
+curl -i -X GET "http://127.0.0.1:9080/get?foo1=bar1&foo2=bar2" -H "Host: httpbin.org"
+----
 
 It returns data from our Upstream service (actually httpbin.org) and the
 result is as expected.
@@ -235,9 +240,10 @@ To show this let's move over to our terminal.
 
 To test this we can simply run following command:
 
-....
+[source,bash]
+----
 curl -i -X GET "http://127.0.0.1:9080/anything/foo?arg=10" -H "Host: example.com"
-....
+----
 
 We want to access with GET HTTP method with specified parameters the endpoint.
 
@@ -249,9 +255,10 @@ image::http-unauthorized-error-screenshot.png[]
 And what we can do we need to send the API key.
 So let's add to the end of my request API key of _Example Consumer_ and press enter.
 
-....
+[source,bash]
+----
 curl -i -X GET http://127.0.0.1:9080/get -H "Host: httpbin.org" -H "apikey: key-of-john"
-....
+----
 
 Now as you can see I can access my API endpoint.
 
@@ -292,7 +299,7 @@ Let's apply to our existing API JWT Auth plugin.
 
 Set to our existing _example_consumer_ plugin config the value of the jwt-auth as an option:
 
-[source,text]
+[source,bash]
 ----
 curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
 {
@@ -312,7 +319,7 @@ image::jwt-add-consumer-screenshot.png[]
 
 For the exising _Example route_ we created previously, enable jwt-auth plugin too:
 
-[source,text]
+[source,bash]
 ----
 
 curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
@@ -341,9 +348,9 @@ as it is described https://apisix.apache.org/docs/apisix/plugins/jwt-auth#:~:tex
 
 Run the following curl cmd to generate new JWT token:
 
-[source,text]
+[source,bash]
 ----
- curl http://127.0.0.1:9080/apisix/plugin/jwt/sign?key=user-key -i
+curl http://127.0.0.1:9080/apisix/plugin/jwt/sign?key=user-key -i
 ----
 
 Token is generated:
@@ -352,7 +359,7 @@ image::jwt-token-generated-screenshot.png[]
 
 Set generated token to your GET request:
 
-[source,text]
+[source,bash]
 ----
 curl -i -X GET http://127.0.0.1:9080/get -H 'Authorization: <SET_GENERATED_TOKEN>'
 ----
@@ -366,7 +373,7 @@ in the Header request, you will get HTTP Error _401 Unauthorized_
 
 Try it yourself:
 
-[source,text]
+[source,bash]
 ----
 curl -i -X GET http://127.0.0.1:9080/get
 ----
@@ -393,7 +400,7 @@ the allowed range, the system throws an error, and login will not be possible.
 
 Let's enable `ip-restriction` plugin for our existing _example route_.
 
-[source,text]
+[source,bash]
 ----
 curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
 {
@@ -418,7 +425,7 @@ image::ip-restrictions-enable-plugin-screenshot.png[]
 Now we enabled IP restriction by whitelisting only certain IP addresses, and other requests from different
 IP addresses will be rejected simply.
 
-[source,text]
+[source,bash]
 ----
 curl http://127.0.0.1:9080/get -i --interface 127.0.0.2
 ----
@@ -437,7 +444,7 @@ When you want to disable the ip-restriction plugin (Another plugin), it is very 
 json configuration from the plugin configuration, no need to restart the service (Since Apache APISIX Plugin supports
 hot reloading), it will take effect immediately:
 
-[source,text]
+[source,bash]
 ----
 curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
 {
@@ -469,7 +476,7 @@ can be made in a given period of seconds, minutes, hours, days, months, or years
 
 Let's enable `limit-count` plugin on the specified route before. To do so, please run the following cmd:
 
-[source,text]
+[source,bash]
 ----
 curl -i http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
 {
@@ -494,7 +501,7 @@ image::limit-count-plugin-enable-screenshot.png[]
 The above configuration limits access to only 2 times in 60 seconds.
 The first two visits will be normally accepted. Let's see:
 
-[source,text]
+[source,bash]
 ----
 curl -i http://127.0.0.1:9080/get
 ----
@@ -507,7 +514,6 @@ TIP: If you set the property _rejected_msg_ in your request to custom message, f
 "_Requests are too frequent, please try again later._",
 when you visit for the third time, you will receive a response body like below:
 
-[source,text]
 ----
 HTTP/1.1 503 Service Temporarily Unavailable
 Content-Type: text/html
