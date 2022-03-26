@@ -717,3 +717,96 @@ In addition to this, you can view Grafana dashboard running in your local instan
 image::prometheus-plugin-grafana-dashboard-screenshot.png[]
 
 Behind the scene, Apache APISIX downloads https://github.com/apache/apisix/blob/master/docs/assets/other/json/apisix-grafana-dashboard.json[Grafana dashboard meta], imports it to Grafana and fetches real time metrics from Prometheus plugin.
+
+=== Serverless Plugin
+
+Serverless is a cloud-native development model that allows developers to build and run applications without having to manage servers. It provides all the continually updated infrastructure and resources needed to run your applications.
+
+Apache APISIX provides support for serverless frameworks for popular cloud vendors such as https://azure.microsoft.com/en-in/services/functions/[Azure Functions^]
+
+[INFO]
+====
+https://apisix.apache.org/docs/apisix/plugins/azure-functions[Azure Functions Serverless Plugin^] lets the users define an upstream to the Azure HTTP Trigger based Function with the combination of other request plugins to secure, manage Azure functions as a dynamic upstream to proxy all requests for a particular URI.
+====
+
+We are assuming your https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=in-process%2Cfunctionsv2&pivots=programming-language-csharp[HTTP Trigger Function^] is deployed in Azure and ready to be served.
+Please, follow the tutorial to https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-function-app-portal[create your first function in the Azure portal^]
+
+Let's run the following cmd to enable `azure-functions` plugin:
+
+[source,bash]
+----
+# enable azure function for a route
+curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    "plugins": {
+        "azure-functions": {
+            "function_uri": "http://apisix-gateway.azurewebsites.net/api/HttpTrigger",
+            "authorization": {
+                "apikey": "<Generated API key to access the Azure-Function>"
+            }
+        }
+    },
+    "uri": "/azure"
+}'
+----
+
+Response:
+
+[source,json]
+----
+{
+  "node": {
+    "key": "/apisix/routes/1",
+    "value": {
+      "plugins": {
+        "azure-functions": {
+          "keepalive_timeout": 60000,
+          "timeout": 3000,
+          "authorization": {
+            "apikey": "<Generated API key to access the Azure-Function>"
+          },
+          "keepalive": true,
+          "function_uri": "http://apisix-gateway.azurewebsites.net/api/HttpTrigger",
+          "ssl_verify": true,
+          "keepalive_pool": 5
+        }
+      },
+      "status": 1,
+      "id": "1",
+      "priority": 0,
+      "update_time": 1648290716,
+      "uri": "/azure",
+      "create_time": 1646341656
+    }
+  },
+  "action": "set"
+}
+
+----
+
+Now any requests (HTTP/1.1, HTTPS, HTTP2) to URI `/azure` on the Apache APISIX gateway will trigger an HTTP based function For example ( here Azure Cloud Function just take the name query param and returns Hello $name):
+
+[source,bash]
+----
+curl -i -XGET http://localhost:9080/azure\?name=APISIX
+----
+
+Output:
+
+[source,text]
+----
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Date: Sat, 26 Mar 2022 10:39:18 GMT
+Request-Context: appId=cid-v1:d936efd3-f2ad-43dd-86bd-360a0cde6cf8
+Server: APISIX/2.12.1
+
+Hello, APISIX. This HTTP triggered function executed successfully.
+----
+
+As we reviewed, the plugin can invoke Azure Functions and supports authorization to Azure cloud service via API keys and https://azure.microsoft.com/en-us/services/active-directory/[Azure active directory^].
+
+TIP: More about the Apache APISIX Azure function plugin, you can read on https://apisix.apache.org/blog/2021/12/01/apisix-supports-azure-functions/[this blog post^].
