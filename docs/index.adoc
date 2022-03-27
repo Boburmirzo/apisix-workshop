@@ -211,6 +211,15 @@ Click btn:[Enable] and push the toggle switch on.
 Then, provide a key for the Consumer, _e.g._, `john`.
 btn:[Submit], click btn:[Next] and btn:[Submit] again.
 
+Raw JSON data for Plugin editor config:
+
+[source,json5]
+----
+{
+  "key": "key-of-john"
+}
+----
+
 image::plugin-config-example-screenshot.png[]
 
 At this point, we should have a ready-to-use Consumer.
@@ -221,27 +230,64 @@ We control the data allowed to transit via the gateway by adding authentication.
 We can identify *unique* Consumers accessing our API.
 Any request that does not include a valid API key will be rejected with an HTTP `401` status.
 
-To prove it, let's move back to the terminal.
+To prove it, let's move back to the terminal and run below curl command.
 
 [source,bash]
 ----
-curl -i -X GET "http://127.0.0.1:9080/anything/foo?arg=10" -H "Host: example.com"
+ curl -i -X GET http://127.0.0.1:9080/get"
 ----
 
 Because we didn't set the authentication key, Apache APISIX will return an unauthorized error.
 
-image::http-unauthorized-error-screenshot.png[]
+Response:
+
+[source,json5]
+----
+HTTP/1.1 401 Unauthorized
+Date: Sun, 27 Mar 2022 15:18:15 GMT
+Content-Type: text/plain; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: APISIX/2.12.1
+
+{"message":"Missing API key found in request"}
+----
+
 
 We can retry the same request with the authentication key.
 
 [source,bash]
 ----
-curl -i -X GET http://127.0.0.1:9080/get -H "Host: httpbin.org" -H "apikey: key-of-john"
+curl -i -X GET http://127.0.0.1:9080/get -H "apikey: key-of-john"
 ----
 
 We can now successfully access the endpoint!
 
-image::access-endpoint-with-consumer.png[]
+[source,json5]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 330
+Connection: keep-alive
+Date: Sun, 27 Mar 2022 15:22:27 GMT
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Server: APISIX/2.12.1
+
+{
+"args": {},
+"headers": {
+"Accept": "*/*",
+"Apikey": "key-of-john",
+"Host": "127.0.0.1",
+"User-Agent": "curl/7.68.0",
+"X-Amzn-Trace-Id": "Root=1-62408133-62400aae5dea7be428a89f8b",
+"X-Forwarded-Host": "127.0.0.1"
+},
+"origin": "172.19.0.1, 85.253.48.169",
+"url": "http://127.0.0.1/get"
+}
+----
 
 This section shows how to use Apache APISIX to deploy, configure, and securely publish APIs from the Dashboard.
 
@@ -546,7 +592,7 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 
 You will get the following response:
 
-[source,json]
+[source,json5]
 ----
 {
   "node": {
@@ -632,7 +678,7 @@ When set _prefer_name_ to true in the request attribute, it will print route/ser
 
 Response:
 
-[source,json]
+[source,json5]
 ----
 {
   "node": {
@@ -758,7 +804,7 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 
 Response:
 
-[source,json]
+[source,json5]
 ----
 {
   "node": {
@@ -859,13 +905,13 @@ image::plugin-orchestration-configure-limit-req-screenshot.png[]
 
 To http-logger settings, we can just put our mock server uri address like below:
 
-[source,json]
+[source,json5]
 ----
 {"uri": "http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61"}
 ----
 
 image::plugin-orchestration-configure-http-logger-screenshot.png[]
 
-Finally, click next and submit the changes applied on the route.
+Finally, click btn:[Next] and btn:[Submit] the changes applied on the route.
 
 

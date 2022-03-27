@@ -814,6 +814,16 @@ Among the many plugins available, let&#8217;s choose <code>key auth</code>.</p>
 Then, provide a key for the Consumer, <em>e.g.</em>, <code>john</code>.
 <b class="button">Submit</b>, click <b class="button">Next</b> and <b class="button">Submit</b> again.</p>
 </div>
+<div class="paragraph">
+<p>Raw JSON data for Plugin editor config:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json5">{
+  &quot;key&quot;: &quot;key-of-john&quot;
+}</code></pre>
+</div>
+</div>
 <div class="imageblock">
 <div class="content">
 <img src="plugin-config-example-screenshot.png" alt="plugin config example screenshot">
@@ -833,19 +843,29 @@ We can identify <strong>unique</strong> Consumers accessing our API.
 Any request that does not include a valid API key will be rejected with an HTTP <code>401</code> status.</p>
 </div>
 <div class="paragraph">
-<p>To prove it, let&#8217;s move back to the terminal.</p>
+<p>To prove it, let&#8217;s move back to the terminal and run below curl command.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET &quot;http://127.0.0.1:9080/anything/foo?arg=10&quot; -H &quot;Host: example.com&quot;</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash"> curl -i -X GET http://127.0.0.1:9080/get&quot;</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Because we didn&#8217;t set the authentication key, Apache APISIX will return an unauthorized error.</p>
 </div>
-<div class="imageblock">
+<div class="paragraph">
+<p>Response:</p>
+</div>
+<div class="listingblock">
 <div class="content">
-<img src="http-unauthorized-error-screenshot.png" alt="http unauthorized error screenshot">
+<pre class="CodeRay highlight"><code data-lang="json5">HTTP/1.1 401 Unauthorized
+Date: Sun, 27 Mar 2022 15:18:15 GMT
+Content-Type: text/plain; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: APISIX/2.12.1
+
+{&quot;message&quot;:&quot;Missing API key found in request&quot;}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -853,15 +873,36 @@ Any request that does not include a valid API key will be rejected with an HTTP 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET http://127.0.0.1:9080/get -H &quot;Host: httpbin.org&quot; -H &quot;apikey: key-of-john&quot;</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET http://127.0.0.1:9080/get -H &quot;apikey: key-of-john&quot;</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>We can now successfully access the endpoint!</p>
 </div>
-<div class="imageblock">
+<div class="listingblock">
 <div class="content">
-<img src="access-endpoint-with-consumer.png" alt="access endpoint with consumer">
+<pre class="CodeRay highlight"><code data-lang="json5">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 330
+Connection: keep-alive
+Date: Sun, 27 Mar 2022 15:22:27 GMT
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Server: APISIX/2.12.1
+
+{
+&quot;args&quot;: {},
+&quot;headers&quot;: {
+&quot;Accept&quot;: &quot;*/*&quot;,
+&quot;Apikey&quot;: &quot;key-of-john&quot;,
+&quot;Host&quot;: &quot;127.0.0.1&quot;,
+&quot;User-Agent&quot;: &quot;curl/7.68.0&quot;,
+&quot;X-Amzn-Trace-Id&quot;: &quot;Root=1-62408133-62400aae5dea7be428a89f8b&quot;,
+&quot;X-Forwarded-Host&quot;: &quot;127.0.0.1&quot;
+},
+&quot;origin&quot;: &quot;172.19.0.1, 85.253.48.169&quot;,
+&quot;url&quot;: &quot;http://127.0.0.1/get&quot;
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1314,36 +1355,36 @@ You could generate a mock HTTP server at <a href="http://mockbin.org/bin/create"
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{
-  <span style="color:#606"><span style="color:#404">&quot;</span><span>node</span><span style="color:#404">&quot;</span></span>: {
-    <span style="color:#606"><span style="color:#404">&quot;</span><span>value</span><span style="color:#404">&quot;</span></span>: {
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>update_time</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1648189729</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>uri</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">/get</span><span style="color:#710">&quot;</span></span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>create_time</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1646341656</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>status</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>priority</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">0</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>upstream_id</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">1</span><span style="color:#710">&quot;</span></span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>plugins</span><span style="color:#404">&quot;</span></span>: {
-        <span style="color:#606"><span style="color:#404">&quot;</span><span>http-logger</span><span style="color:#404">&quot;</span></span>: {
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>include_resp_body</span><span style="color:#404">&quot;</span></span>: <span style="color:#088">false</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>timeout</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">3</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>include_req_body</span><span style="color:#404">&quot;</span></span>: <span style="color:#088">false</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>concat_method</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">json</span><span style="color:#710">&quot;</span></span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>name</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">http logger</span><span style="color:#710">&quot;</span></span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>auth_header</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#710">&quot;</span></span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>uri</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61</span><span style="color:#710">&quot;</span></span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>batch_max_size</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1000</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>max_retry_count</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">0</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>retry_delay</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>buffer_duration</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">60</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>inactive_timeout</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">5</span>
+<pre class="CodeRay highlight"><code data-lang="json5">{
+  &quot;node&quot;: {
+    &quot;value&quot;: {
+      &quot;update_time&quot;: 1648189729,
+      &quot;uri&quot;: &quot;/get&quot;,
+      &quot;create_time&quot;: 1646341656,
+      &quot;status&quot;: 1,
+      &quot;priority&quot;: 0,
+      &quot;upstream_id&quot;: &quot;1&quot;,
+      &quot;plugins&quot;: {
+        &quot;http-logger&quot;: {
+          &quot;include_resp_body&quot;: false,
+          &quot;timeout&quot;: 3,
+          &quot;include_req_body&quot;: false,
+          &quot;concat_method&quot;: &quot;json&quot;,
+          &quot;name&quot;: &quot;http logger&quot;,
+          &quot;auth_header&quot;: &quot;&quot;,
+          &quot;uri&quot;: &quot;http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61&quot;,
+          &quot;batch_max_size&quot;: 1000,
+          &quot;max_retry_count&quot;: 0,
+          &quot;retry_delay&quot;: 1,
+          &quot;buffer_duration&quot;: 60,
+          &quot;inactive_timeout&quot;: 5
         }
       },
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>id</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">1</span><span style="color:#710">&quot;</span></span>
+      &quot;id&quot;: &quot;1&quot;
     },
-    <span style="color:#606"><span style="color:#404">&quot;</span><span>key</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">/apisix/routes/1</span><span style="color:#710">&quot;</span></span>
+    &quot;key&quot;: &quot;/apisix/routes/1&quot;
   },
-  <span style="color:#606"><span style="color:#404">&quot;</span><span>action</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">set</span><span style="color:#710">&quot;</span></span>
+  &quot;action&quot;: &quot;set&quot;
 }</code></pre>
 </div>
 </div>
@@ -1422,25 +1463,25 @@ can fetch API metrics data and you can show metrics exported by the plugin in <a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{
-  <span style="color:#606"><span style="color:#404">&quot;</span><span>node</span><span style="color:#404">&quot;</span></span>: {
-    <span style="color:#606"><span style="color:#404">&quot;</span><span>value</span><span style="color:#404">&quot;</span></span>: {
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>update_time</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1648206467</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>uri</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">/get</span><span style="color:#710">&quot;</span></span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>create_time</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1646341656</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>status</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>priority</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">0</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>plugins</span><span style="color:#404">&quot;</span></span>: {
-        <span style="color:#606"><span style="color:#404">&quot;</span><span>prometheus</span><span style="color:#404">&quot;</span></span>: {
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>prefer_name</span><span style="color:#404">&quot;</span></span>: <span style="color:#088">false</span>
+<pre class="CodeRay highlight"><code data-lang="json5">{
+  &quot;node&quot;: {
+    &quot;value&quot;: {
+      &quot;update_time&quot;: 1648206467,
+      &quot;uri&quot;: &quot;/get&quot;,
+      &quot;create_time&quot;: 1646341656,
+      &quot;status&quot;: 1,
+      &quot;priority&quot;: 0,
+      &quot;plugins&quot;: {
+        &quot;prometheus&quot;: {
+          &quot;prefer_name&quot;: false
         }
       },
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>upstream_id</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">1</span><span style="color:#710">&quot;</span></span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>id</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">1</span><span style="color:#710">&quot;</span></span>
+      &quot;upstream_id&quot;: &quot;1&quot;,
+      &quot;id&quot;: &quot;1&quot;
     },
-    <span style="color:#606"><span style="color:#404">&quot;</span><span>key</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">/apisix/routes/1</span><span style="color:#710">&quot;</span></span>
+    &quot;key&quot;: &quot;/apisix/routes/1&quot;
   },
-  <span style="color:#606"><span style="color:#404">&quot;</span><span>action</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">set</span><span style="color:#710">&quot;</span></span>
+  &quot;action&quot;: &quot;set&quot;
 }</code></pre>
 </div>
 </div>
@@ -1588,32 +1629,32 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{
-  <span style="color:#606"><span style="color:#404">&quot;</span><span>node</span><span style="color:#404">&quot;</span></span>: {
-    <span style="color:#606"><span style="color:#404">&quot;</span><span>key</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">/apisix/routes/1</span><span style="color:#710">&quot;</span></span>,
-    <span style="color:#606"><span style="color:#404">&quot;</span><span>value</span><span style="color:#404">&quot;</span></span>: {
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>plugins</span><span style="color:#404">&quot;</span></span>: {
-        <span style="color:#606"><span style="color:#404">&quot;</span><span>azure-functions</span><span style="color:#404">&quot;</span></span>: {
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>keepalive_timeout</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">60000</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>timeout</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">3000</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>authorization</span><span style="color:#404">&quot;</span></span>: {
-            <span style="color:#606"><span style="color:#404">&quot;</span><span>apikey</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">&lt;Generated API key to access the Azure-Function&gt;</span><span style="color:#710">&quot;</span></span>
+<pre class="CodeRay highlight"><code data-lang="json5">{
+  &quot;node&quot;: {
+    &quot;key&quot;: &quot;/apisix/routes/1&quot;,
+    &quot;value&quot;: {
+      &quot;plugins&quot;: {
+        &quot;azure-functions&quot;: {
+          &quot;keepalive_timeout&quot;: 60000,
+          &quot;timeout&quot;: 3000,
+          &quot;authorization&quot;: {
+            &quot;apikey&quot;: &quot;&lt;Generated API key to access the Azure-Function&gt;&quot;
           },
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>keepalive</span><span style="color:#404">&quot;</span></span>: <span style="color:#088">true</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>function_uri</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">http://apisix-gateway.azurewebsites.net/api/HttpTrigger</span><span style="color:#710">&quot;</span></span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>ssl_verify</span><span style="color:#404">&quot;</span></span>: <span style="color:#088">true</span>,
-          <span style="color:#606"><span style="color:#404">&quot;</span><span>keepalive_pool</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">5</span>
+          &quot;keepalive&quot;: true,
+          &quot;function_uri&quot;: &quot;http://apisix-gateway.azurewebsites.net/api/HttpTrigger&quot;,
+          &quot;ssl_verify&quot;: true,
+          &quot;keepalive_pool&quot;: 5
         }
       },
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>status</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>id</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">1</span><span style="color:#710">&quot;</span></span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>priority</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">0</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>update_time</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1648290716</span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>uri</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">/azure</span><span style="color:#710">&quot;</span></span>,
-      <span style="color:#606"><span style="color:#404">&quot;</span><span>create_time</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1646341656</span>
+      &quot;status&quot;: 1,
+      &quot;id&quot;: &quot;1&quot;,
+      &quot;priority&quot;: 0,
+      &quot;update_time&quot;: 1648290716,
+      &quot;uri&quot;: &quot;/azure&quot;,
+      &quot;create_time&quot;: 1646341656
     }
   },
-  <span style="color:#606"><span style="color:#404">&quot;</span><span>action</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">set</span><span style="color:#710">&quot;</span></span>
+  &quot;action&quot;: &quot;set&quot;
 }</code></pre>
 </div>
 </div>
@@ -1742,7 +1783,7 @@ we will have a diagram similar to below:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="json">{<span style="color:#606"><span style="color:#404">&quot;</span><span>uri</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61</span><span style="color:#710">&quot;</span></span>}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="json5">{&quot;uri&quot;: &quot;http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61&quot;}</code></pre>
 </div>
 </div>
 <div class="imageblock">
@@ -1751,7 +1792,7 @@ we will have a diagram similar to below:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Finally, click next and submit the changes applied on the route.</p>
+<p>Finally, click <b class="button">Next</b> and <b class="button">Submit</b> the changes applied on the route.</p>
 </div>
 </div>
 </div>
@@ -1759,7 +1800,7 @@ we will have a diagram similar to below:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-03-27 17:51:52 +0300
+Last updated 2022-03-27 18:28:55 +0300
 </div>
 </div>
 </body>
