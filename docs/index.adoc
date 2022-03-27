@@ -732,6 +732,11 @@ https://apisix.apache.org/docs/apisix/plugins/azure-functions[Azure Functions Se
 We are assuming your https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=in-process%2Cfunctionsv2&pivots=programming-language-csharp[HTTP Trigger Function^] is deployed in Azure and ready to be served.
 Please, follow the tutorial to https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-function-app-portal[create your first function in the Azure portal^]
 
+image::azure-function-exists-screentshot.png[]
+
+For the purpose of demo, the Function app is running on this address
+`https://apisix-gateway.azurewebsites.net/`
+
 Let's run the following cmd to enable `azure-functions` plugin:
 
 [source,bash]
@@ -809,4 +814,58 @@ Hello, APISIX. This HTTP triggered function executed successfully.
 
 As we reviewed, the plugin can invoke Azure Functions and supports authorization to Azure cloud service via API keys and https://azure.microsoft.com/en-us/services/active-directory/[Azure active directory^].
 
-TIP: More about the Apache APISIX Azure function plugin, you can read on https://apisix.apache.org/blog/2021/12/01/apisix-supports-azure-functions/[this blog post^].
+[TIP]
+====
+More about the Apache APISIX Azure function plugin, you can read on https://apisix.apache.org/blog/2021/12/01/apisix-supports-azure-functions/[this blog post^].
+====
+
+=== Plugin Orchestration
+
+Sometimes your service requires you to use many plugins together or create custom plugins in addition to Apache Apisix provides. Plugin orchestration is a form of low-code that can help enterprises automate development.
+
+[INFO]
+====
+With the plugin orchestration capability in the low-code API gateway Apache APISIX, we can easily orchestrate 50+ plugins in a “drag-and-drop” way.
+====
+
+In the Apache APISIX Dashboard's, Plugin config web interface lists the currently available plugins and drawing boards, and we can drag and drop the plugins onto the drawing boards to arrange them.
+
+image::plugin-orchestration-dashboard-demo-screenshot.png[]
+
+[TIP]
+====
+More about the Apache APISIX plugin orchestration you can read on this https://apisix.apache.org/blog/2021/07/27/use-of-plugin-orchestration-in-apache-apisix/[blog post^]
+====
+
+Let's think of new scenario where we decide the subsequent API request processing logic based on the processing result of previous plugin:
+
+1. All requests are authenticated using the `key-auth` plugin.
+2. If the authentication passes, `http-logger` takes over and logs API operations.
+3. If the authentication fails, the plugin returns a 401 (Unauthorized) HTTP status code.
+4. The `limit-req` plugin is used to control request speed.
+
+After putting all building blocks to the drawing board (plugins, condition),
+we will have a diagram similar to below:
+
+image::plugin-orchestraion-new-scenario-screenshot.png[]
+
+We need to also configure a rule for our condition like `code == 401` for negative case, if the request authentication fails.
+
+image::plugin-orchestration-configure-rule-screenshot.png[]
+
+You can fill in limit-req plugin config the following details in the Plugin Editor.
+
+image::plugin-orchestration-configure-limit-req-screenshot.png[]
+
+To http-logger settings, we can just put our mock server uri address like below:
+
+[source,json]
+----
+{"uri": "http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61"}
+----
+
+image::plugin-orchestration-configure-http-logger-screenshot.png[]
+
+Finally, click next and submit the changes applied on the route.
+
+
