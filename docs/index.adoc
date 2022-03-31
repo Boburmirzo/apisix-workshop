@@ -565,7 +565,10 @@ image::limit-count-plugin-enable-with-dashboard-screenshot.png[]
 
 API observability is the ability to understand system behavior and investigate the interactions between an application's components. It provides for your API tracers, metrics and loggers.
 
-An API event is logged each time an API operation is invoked and for each API event. You can gain analytic insights into your API activities or debug your APIs through the logged data
+The core of API observability breaks down into three key areas: structured logs, metrics, and traces. Let’s break down each pillar and learn how with Apache APISIX Plugins we can simplify these tasks.
+
+Logs are also easy to instrument and trivial step of API observability.
+An API event is logged each time an API operation is invoked. You can gain analytic insights into your API activities or debug your APIs through the logged data
 
 [INFO]
 ====
@@ -575,6 +578,13 @@ pushes Log data requests to HTTP/HTTPS servers or sends as JSON objects to Monit
 
 The following is an example of how to enable the http-logger for our specific route.
 You could generate a mock HTTP server at http://mockbin.org/bin/create[mockbin^] to view the logs.
+
+To http-logger settings, we can just put our mock server uri address like below:
+
+[source,json5]
+----
+{"uri": "http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61"}
+----
 
 [source,bash]
 ----
@@ -638,12 +648,6 @@ curl -i http://127.0.0.1:9080/get
 As you can see, some recent logs are sent to our mock server:
 
 image::http-logger-plugin-test-screenshot.png[]
-
-[INFO]
-====
-You can find information about other Apache APISIX Observability
-Plugins https://apisix.apache.org/docs/apisix/plugins/zipkin[here^].
-====
 
 === Prometheus plugin
 
@@ -764,6 +768,118 @@ image::prometheus-plugin-grafana-dashboard-screenshot.png[]
 
 Behind the scene, Apache APISIX downloads https://github.com/apache/apisix/blob/master/docs/assets/other/json/apisix-grafana-dashboard.json[Grafana dashboard meta], imports it to Grafana and fetches real time metrics from Prometheus plugin.
 
+=== Zipkin Plugin
+
+The third observability pillar is a tracing or distributed tracing allows you to understand the life of a request as it traverses your service network allows you to answer questions like
+what service has this request touched and how much latency was introduced.
+
+Traces enable you to further explore which logs to look at for a particular session or related set of API calls.
+
+[INFO]
+====
+https://github.com/openzipkin/zipkin[Zipkin^] an open source distributed tracing system. https://apisix.apache.org/docs/apisix/plugins/zipkin[APISIX Zipkin plugin^] is supported to collect tracing and report to Zipkin Collector based on https://zipkin.io/pages/instrumenting.html[Zipkin API specification^].
+====
+
+Here's an example to enable the `zipkin plugin` on the specified route:
+
+[source,bash]
+----
+curl http://127.0.0.1:9080/apisix/admin/routes/1  -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    "methods": ["GET"],
+    "uri": "/get",
+    "plugins": {
+        "zipkin": {
+            "endpoint": "http://127.0.0.1:9411/api/v2/spans",
+            "sample_ratio": 1
+        }
+    },
+    "upstream_id": "1"
+}'
+----
+
+Successful response looks like below:
+
+[source,json5]
+----
+{
+  "node": {
+    "key": "/apisix/routes/1",
+    "value": {
+      "upstream_id": "1",
+      "status": 1,
+      "create_time": 1646341656,
+      "uri": "/get",
+      "methods": [
+        "GET"
+      ],
+      "update_time": 1648558131,
+      "id": "1",
+      "plugins": {
+        "zipkin": {
+          "endpoint": "http://127.0.0.1:9411/api/v2/spans",
+          "span_version": 2,
+          "server_addr": "<your-local-ip-address>",
+          "service_name": "APISIX",
+          "sample_ratio": 1
+        }
+      },
+      "priority": 0
+    }
+  },
+  "action": "set"
+}
+----
+
+We can test our example by simple running the following command:
+
+[source,bash]
+----
+curl -i http://127.0.0.1:9080/get
+----
+
+Response:
+[source,json5]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 469
+Connection: keep-alive
+Date: Thu, 31 Mar 2022 10:03:26 GMT
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Server: APISIX/2.13.0
+
+{
+  "args": {},
+  "headers": {
+    "Accept": "*/*",
+    "Host": "127.0.0.1",
+    "User-Agent": "curl/7.68.0",
+    "X-Amzn-Trace-Id": "Root=1-62457c6e-0dc0ed5b49ccc6fc7956dc2e",
+    "X-B3-Parentspanid": "61bd3f4046a800e7",
+    "X-B3-Sampled": "1",
+    "X-B3-Spanid": "855cd5465957f414",
+    "X-B3-Traceid": "e18985df47dab632d62083fd96626692",
+    "X-Forwarded-Host": "127.0.0.1"
+  },
+  "origin": "172.19.0.1, 85.253.48.169",
+  "url": "http://127.0.0.1/get"
+}
+----
+
+Then you can use a browser to access http://127.0.0.1:9411/zipkin, see traces on the Web UI of Zipkin
+
+image::zipkin-output-screenshot-1.png[]
+
+image::zipkin-output-screenshot-2.png[]
+
+[INFO]
+====
+You can find information about other Apache APISIX Observability
+Plugins https://apisix.apache.org/docs/apisix/plugins/zipkin[here^].
+====
+
 === Serverless Plugin
 
 Serverless is a cloud-native development model that allows developers to build and run applications without having to manage servers. It provides all the continually updated infrastructure and resources needed to run your applications.
@@ -787,7 +903,6 @@ Let's run the following cmd to enable `azure-functions` plugin:
 
 [source,bash]
 ----
-# enable azure function for a route
 curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
 {
     "plugins": {
@@ -885,33 +1000,28 @@ More about the Apache APISIX plugin orchestration you can read on this https://a
 
 Let's think of new scenario where we decide the subsequent API request processing logic based on the processing result of previous plugin:
 
-1. All requests are authenticated using the `key-auth` plugin.
-2. If the authentication passes, `http-logger` takes over and logs API operations.
-3. If the authentication fails, the plugin returns a 401 (Unauthorized) HTTP status code.
-4. The `limit-req` plugin is used to control request speed.
+1. Our API receives requests only from whitelisted IPs with the `ip-restriction` plugin control.
+2. If the IP is in the whitelist, `limit-count` takes over and limits
+the number of requests 2 within 60 seconds time window.
+3. If new request comes from different IP range, the plugin returns a 403 (requested resource is forbidden) HTTP status code.
 
 After putting all building blocks to the drawing board (plugins, condition),
 we will have a diagram similar to below:
 
 image::plugin-orchestraion-new-scenario-screenshot.png[]
 
-We need to also configure a rule for our condition like `code == 401` for negative case, if the request authentication fails.
+We need to also configure a rule for our condition like `code == 403` for negative case, if the request from unknown IP address. Double-click btn:[Condition] and new _Configure Rule_
+pop-up menu appears.
 
 image::plugin-orchestration-configure-rule-screenshot.png[]
 
-You can fill in limit-req plugin config the following details in the Plugin Editor.
+You can fill in `ip-restriction` plugin config the following details in the Plugin Editor. Double-click on btn:[ip-restriction], apply config and click btn:[Submit].
 
-image::plugin-orchestration-configure-limit-req-screenshot.png[]
+image::plugin-orchestration-configure-ip-restriction-config-screenshot.png[]
 
-To http-logger settings, we can just put our mock server uri address like below:
+Similarly to `limit-count`:
 
-[source,json5]
-----
-{"uri": "http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61"}
-----
-
-image::plugin-orchestration-configure-http-logger-screenshot.png[]
+image::plugin-orchestration-configure-limit-count-config-screenshot.png[]
 
 Finally, click btn:[Next] and btn:[Submit] the changes applied on the route.
-
 
