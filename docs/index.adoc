@@ -71,21 +71,26 @@ Route.
 
 === How it works
 
-We can create a https://apisix.apache.org/docs/apisix/architecture-design/route/[Route^] and connect it to an https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream^].
-When Apache APISIX receives a request, it computes which Upstream it should forward it.
+Apache APISIX is based on a couple of primitives:
+
+* One of them is the https://apisix.apache.org/docs/apisix/architecture-design/route/[Route^]
+* Another is the https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream^]
+
+We can create a Route and configure the underlying Upstream. 
+When Apache APISIX receives a request matching the Route, it forwards it to the underlying Upstream.
 
 === Route Configuration
 
-The following curl command creates a sample configuration of Route:
+The following command creates a sample Route:
 
 [source,bash]
 ----
-curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f136f87ad84b625c8f1" -X PUT -d '
+curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f136f87ad84b625c8f1" -X PUT -d '  <1><2><3>
 {
-  "methods": ["GET"],
-  "host": "example.com",
-  "uri": "/anything/*",
-  "upstream": {
+  "methods": ["GET"],                     <4>
+  "host": "example.com",                  <5>
+  "uri": "/anything/*",                   <6>
+  "upstream": {                           <7>
     "type": "roundrobin",
     "nodes": {
       "httpbin.org:80": 1
@@ -94,21 +99,44 @@ curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f
 }'
 ----
 
-Once we have created the Route, we can access the Upstream through the Apache APISIX.
+<1> The configuration of Apache APISIX objects is handled via a REST API
+<2> The `/apisix/admin/routes` endpoint manages Routes
+<3> Because configuration is a highly critical feature, we need to authenticate via an API key.
+Here, we use the default one.
+It's highly advised to generate your own, and regularly change it.
+<4> HTTP method matching the newly-defined route
+<5> Host matching the newly-defined route
+<6> URI matching the newly-defined route.
+Notice the star character:
+every URI starting with `/anything/` matches.
+<7> Upstream defined at the same time as the Route.
+An Upstream references a cluster of nodes, which you can balance load across, depending on some algorithm.
+Here, we have a single Upstream, so we can use any algorithm.
+
+Once we have created the Route, we can check whether it works.
+Apache APISIX should forward the request to http://httpbin.org:80/anything/foo?arg=10.
 
 [source,bash]
 ----
 curl -i -X GET "http://127.0.0.1:9080/anything/foo?arg=10" -H "Host: example.com"
 ----
 
-Apache APISIX will forward the request to http://httpbin.org:80/anything/foo?arg=10.
-
 == Create an Upstream
+
+In the previous paragraph, we created a Route that defined its Upstream.
+It's also possible to create an Upstream once and reference it in multiple Routes.
 
 Apache APISIX API is consistent.
 The Upstream API is similar to the Route's.
-We can create an Upstream by executing the following command:
+With the help of the https://apisix.apache.org/docs/apisix/architecture-design/upstream/[Upstream documentation^] and the command used to create the Route above, create an Upstream with the following properties:
 
+* ID: `1`
+* Single node
+* The node points to httpbin.org:80
+
+.See the solution
+[%collapsible]
+====
 [source,bash]
 ----
 curl "http://127.0.0.1:9080/apisix/admin/upstreams/1" -H "X-API-KEY: edd1c9f034335f136f87ad84b625c8f1" -X PUT -d '
@@ -119,6 +147,7 @@ curl "http://127.0.0.1:9080/apisix/admin/upstreams/1" -H "X-API-KEY: edd1c9f0343
   }
 }'
 ----
+====
 
 == Bind the Route to the Upstream
 
