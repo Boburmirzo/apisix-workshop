@@ -477,6 +477,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_limit_count_plugin">Limit Count Plugin</a></li>
 <li><a href="#_http_logger_plugin">HTTP Logger Plugin</a></li>
 <li><a href="#_prometheus_plugin">Prometheus plugin</a></li>
+<li><a href="#_zipkin_plugin">Zipkin Plugin</a></li>
 <li><a href="#_serverless_plugin">Serverless Plugin</a></li>
 <li><a href="#_plugin_orchestration">Plugin Orchestration</a></li>
 </ul>
@@ -607,23 +608,36 @@ Route.</p>
 <div class="sect2">
 <h3 id="_how_it_works">How it works</h3>
 <div class="paragraph">
-<p>We can create a <a href="https://apisix.apache.org/docs/apisix/architecture-design/route/" target="_blank" rel="noopener">Route</a> and connect it to an <a href="https://apisix.apache.org/docs/apisix/architecture-design/upstream/" target="_blank" rel="noopener">Upstream</a>.
-When Apache APISIX receives a request, it computes which Upstream it should forward it.</p>
+<p>Apache APISIX is based on a couple of primitives:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>One of them is the <a href="https://apisix.apache.org/docs/apisix/architecture-design/route/" target="_blank" rel="noopener">Route</a></p>
+</li>
+<li>
+<p>Another is the <a href="https://apisix.apache.org/docs/apisix/architecture-design/upstream/" target="_blank" rel="noopener">Upstream</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We can create a Route and configure the underlying Upstream.
+When Apache APISIX receives a request matching the Route, it forwards it to the underlying Upstream.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_route_configuration">Route Configuration</h3>
 <div class="paragraph">
-<p>The following curl command creates a sample configuration of Route:</p>
+<p>The following command creates a sample Route:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl &quot;http://127.0.0.1:9080/apisix/admin/routes/1&quot; -H &quot;X-API-KEY: edd1c9f034335f136f87ad84b625c8f1&quot; -X PUT -d '
+<pre class="CodeRay highlight"><code data-lang="bash">curl &quot;http://127.0.0.1:9080/apisix/admin/routes/1&quot; -H &quot;X-API-KEY: edd1c9f034335f136f87ad84b625c8f1&quot; -X PUT -d '  <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="3"></i><b>(3)</b>
 {
-  &quot;methods&quot;: [&quot;GET&quot;],
-  &quot;host&quot;: &quot;example.com&quot;,
-  &quot;uri&quot;: &quot;/anything/*&quot;,
-  &quot;upstream&quot;: {
+  &quot;methods&quot;: [&quot;GET&quot;],                     <i class="conum" data-value="4"></i><b>(4)</b>
+  &quot;host&quot;: &quot;example.com&quot;,                  <i class="conum" data-value="5"></i><b>(5)</b>
+  &quot;uri&quot;: &quot;/anything/*&quot;,                   <i class="conum" data-value="6"></i><b>(6)</b>
+  &quot;upstream&quot;: {                           <i class="conum" data-value="7"></i><b>(7)</b>
     &quot;type&quot;: &quot;roundrobin&quot;,
     &quot;nodes&quot;: {
       &quot;httpbin.org:80&quot;: 1
@@ -632,16 +646,52 @@ When Apache APISIX receives a request, it computes which Upstream it should forw
 }'</code></pre>
 </div>
 </div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The configuration of Apache APISIX objects is handled via a REST API</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>/apisix/admin/routes</code> endpoint manages Routes</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Because configuration is a highly critical feature, we need to authenticate via an API key.
+Here, we use the default one.
+It&#8217;s highly advised to generate your own, and regularly change it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>HTTP method matching the newly-defined route</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Host matching the newly-defined route</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>URI matching the newly-defined route.
+Notice the star character:
+every URI starting with <code>/anything/</code> matches.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Upstream defined at the same time as the Route.
+An Upstream references a cluster of nodes, which you can balance load across, depending on some algorithm.
+Here, we have a single Upstream, so we can use any algorithm.</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
-<p>Once we have created the Route, we can access the Upstream through the Apache APISIX.</p>
+<p>Once we have created the Route, we can check whether it works.
+Apache APISIX should forward the request to <a href="http://httpbin.org:80/anything/foo?arg=10" class="bare">http://httpbin.org:80/anything/foo?arg=10</a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET &quot;http://127.0.0.1:9080/anything/foo?arg=10&quot; -H &quot;Host: example.com&quot;</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>Apache APISIX will forward the request to <a href="http://httpbin.org:80/anything/foo?arg=10" class="bare">http://httpbin.org:80/anything/foo?arg=10</a>.</p>
 </div>
 </div>
 </div>
@@ -650,10 +700,30 @@ When Apache APISIX receives a request, it computes which Upstream it should forw
 <h2 id="_create_an_upstream">Create an Upstream</h2>
 <div class="sectionbody">
 <div class="paragraph">
+<p>In the previous paragraph, we created a Route that defined its Upstream.
+It&#8217;s also possible to create an Upstream once and reference it in multiple Routes.</p>
+</div>
+<div class="paragraph">
 <p>Apache APISIX API is consistent.
 The Upstream API is similar to the Route&#8217;s.
-We can create an Upstream by executing the following command:</p>
+With the help of the <a href="https://apisix.apache.org/docs/apisix/architecture-design/upstream/" target="_blank" rel="noopener">Upstream documentation</a> and the command used to create the Route above, create an Upstream with the following properties:</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p>ID: <code>1</code></p>
+</li>
+<li>
+<p>Single node</p>
+</li>
+<li>
+<p>The node points to httpbin.org:80</p>
+</li>
+</ul>
+</div>
+<details>
+<summary class="title">See the solution</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl &quot;http://127.0.0.1:9080/apisix/admin/upstreams/1&quot; -H &quot;X-API-KEY: edd1c9f034335f136f87ad84b625c8f1&quot; -X PUT -d '
@@ -665,6 +735,8 @@ We can create an Upstream by executing the following command:</p>
 }'</code></pre>
 </div>
 </div>
+</div>
+</details>
 </div>
 </div>
 <div class="sect1">
@@ -1322,7 +1394,11 @@ Server: APISIX web server
 <p>API observability is the ability to understand system behavior and investigate the interactions between an application&#8217;s components. It provides for your API tracers, metrics and loggers.</p>
 </div>
 <div class="paragraph">
-<p>An API event is logged each time an API operation is invoked and for each API event. You can gain analytic insights into your API activities or debug your APIs through the logged data</p>
+<p>The core of API observability breaks down into three key areas: structured logs, metrics, and traces. Let’s break down each pillar and learn how with Apache APISIX Plugins we can simplify these tasks.</p>
+</div>
+<div class="paragraph">
+<p>Logs are also easy to instrument and trivial step of API observability.
+An API event is logged each time an API operation is invoked. You can gain analytic insights into your API activities or debug your APIs through the logged data</p>
 </div>
 <div class="exampleblock">
 <div class="content">
@@ -1335,6 +1411,14 @@ pushes Log data requests to HTTP/HTTPS servers or sends as JSON objects to Monit
 <div class="paragraph">
 <p>The following is an example of how to enable the http-logger for our specific route.
 You could generate a mock HTTP server at <a href="http://mockbin.org/bin/create" target="_blank" rel="noopener">mockbin</a> to view the logs.</p>
+</div>
+<div class="paragraph">
+<p>To http-logger settings, we can just put our mock server uri address like below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json5">{&quot;uri&quot;: &quot;http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61&quot;}</code></pre>
+</div>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1402,14 +1486,6 @@ You could generate a mock HTTP server at <a href="http://mockbin.org/bin/create"
 <div class="imageblock">
 <div class="content">
 <img src="http-logger-plugin-test-screenshot.png" alt="http logger plugin test screenshot">
-</div>
-</div>
-<div class="exampleblock">
-<div class="content">
-<div class="paragraph">
-<p>You can find information about other Apache APISIX Observability
-Plugins <a href="https://apisix.apache.org/docs/apisix/plugins/zipkin" target="_blank" rel="noopener">here</a>.</p>
-</div>
 </div>
 </div>
 </div>
@@ -1577,6 +1653,137 @@ URL <code><a href="http://localhost:9090/targets" class="bare">http://localhost:
 </div>
 </div>
 <div class="sect2">
+<h3 id="_zipkin_plugin">Zipkin Plugin</h3>
+<div class="paragraph">
+<p>The third observability pillar is a tracing or distributed tracing allows you to understand the life of a request as it traverses your service network allows you to answer questions like
+what service has this request touched and how much latency was introduced.</p>
+</div>
+<div class="paragraph">
+<p>Traces enable you to further explore which logs to look at for a particular session or related set of API calls.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p><a href="https://github.com/openzipkin/zipkin" target="_blank" rel="noopener">Zipkin</a> an open source distributed tracing system. <a href="https://apisix.apache.org/docs/apisix/plugins/zipkin" target="_blank" rel="noopener">APISIX Zipkin plugin</a> is supported to collect tracing and report to Zipkin Collector based on <a href="https://zipkin.io/pages/instrumenting.html" target="_blank" rel="noopener">Zipkin API specification</a>.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s an example to enable the <code>zipkin plugin</code> on the specified route:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/routes/1  -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    &quot;methods&quot;: [&quot;GET&quot;],
+    &quot;uri&quot;: &quot;/get&quot;,
+    &quot;plugins&quot;: {
+        &quot;zipkin&quot;: {
+            &quot;endpoint&quot;: &quot;http://127.0.0.1:9411/api/v2/spans&quot;,
+            &quot;sample_ratio&quot;: 1
+        }
+    },
+    &quot;upstream_id&quot;: &quot;1&quot;
+}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Successful response looks like below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json5">{
+  &quot;node&quot;: {
+    &quot;key&quot;: &quot;/apisix/routes/1&quot;,
+    &quot;value&quot;: {
+      &quot;upstream_id&quot;: &quot;1&quot;,
+      &quot;status&quot;: 1,
+      &quot;create_time&quot;: 1646341656,
+      &quot;uri&quot;: &quot;/get&quot;,
+      &quot;methods&quot;: [
+        &quot;GET&quot;
+      ],
+      &quot;update_time&quot;: 1648558131,
+      &quot;id&quot;: &quot;1&quot;,
+      &quot;plugins&quot;: {
+        &quot;zipkin&quot;: {
+          &quot;endpoint&quot;: &quot;http://127.0.0.1:9411/api/v2/spans&quot;,
+          &quot;span_version&quot;: 2,
+          &quot;server_addr&quot;: &quot;&lt;your-local-ip-address&gt;&quot;,
+          &quot;service_name&quot;: &quot;APISIX&quot;,
+          &quot;sample_ratio&quot;: 1
+        }
+      },
+      &quot;priority&quot;: 0
+    }
+  },
+  &quot;action&quot;: &quot;set&quot;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can test our example by simple running the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -i http://127.0.0.1:9080/get</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Response:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json5">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 469
+Connection: keep-alive
+Date: Thu, 31 Mar 2022 10:03:26 GMT
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Server: APISIX/2.13.0
+
+{
+  &quot;args&quot;: {},
+  &quot;headers&quot;: {
+    &quot;Accept&quot;: &quot;*/*&quot;,
+    &quot;Host&quot;: &quot;127.0.0.1&quot;,
+    &quot;User-Agent&quot;: &quot;curl/7.68.0&quot;,
+    &quot;X-Amzn-Trace-Id&quot;: &quot;Root=1-62457c6e-0dc0ed5b49ccc6fc7956dc2e&quot;,
+    &quot;X-B3-Parentspanid&quot;: &quot;61bd3f4046a800e7&quot;,
+    &quot;X-B3-Sampled&quot;: &quot;1&quot;,
+    &quot;X-B3-Spanid&quot;: &quot;855cd5465957f414&quot;,
+    &quot;X-B3-Traceid&quot;: &quot;e18985df47dab632d62083fd96626692&quot;,
+    &quot;X-Forwarded-Host&quot;: &quot;127.0.0.1&quot;
+  },
+  &quot;origin&quot;: &quot;172.19.0.1, 85.253.48.169&quot;,
+  &quot;url&quot;: &quot;http://127.0.0.1/get&quot;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then you can use a browser to access <a href="http://127.0.0.1:9411/zipkin" class="bare">http://127.0.0.1:9411/zipkin</a>, see traces on the Web UI of Zipkin</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="zipkin-output-screenshot-1.png" alt="zipkin output screenshot 1">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="zipkin-output-screenshot-2.png" alt="zipkin output screenshot 2">
+</div>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>You can find information about other Apache APISIX Observability
+Plugins <a href="https://apisix.apache.org/docs/apisix/plugins/zipkin" target="_blank" rel="noopener">here</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_serverless_plugin">Serverless Plugin</h3>
 <div class="paragraph">
 <p>Serverless is a cloud-native development model that allows developers to build and run applications without having to manage servers. It provides all the continually updated infrastructure and resources needed to run your applications.</p>
@@ -1609,8 +1816,7 @@ Please, follow the tutorial to <a href="https://docs.microsoft.com/en-us/azure/a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash"># enable azure function for a route
-curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
 {
     &quot;plugins&quot;: {
         &quot;azure-functions&quot;: {
@@ -1740,16 +1946,14 @@ Hello, APISIX. This HTTP triggered function executed successfully.</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>All requests are authenticated using the <code>key-auth</code> plugin.</p>
+<p>Our API receives requests only from whitelisted IPs with the <code>ip-restriction</code> plugin control.</p>
 </li>
 <li>
-<p>If the authentication passes, <code>http-logger</code> takes over and logs API operations.</p>
+<p>If the IP is in the whitelist, <code>limit-count</code> takes over and limits
+the number of requests 2 within 60 seconds time window.</p>
 </li>
 <li>
-<p>If the authentication fails, the plugin returns a 401 (Unauthorized) HTTP status code.</p>
-</li>
-<li>
-<p>The <code>limit-req</code> plugin is used to control request speed.</p>
+<p>If new request comes from different IP range, the plugin returns a 403 (requested resource is forbidden) HTTP status code.</p>
 </li>
 </ol>
 </div>
@@ -1763,7 +1967,8 @@ we will have a diagram similar to below:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>We need to also configure a rule for our condition like <code>code == 401</code> for negative case, if the request authentication fails.</p>
+<p>We need to also configure a rule for our condition like <code>code == 403</code> for negative case, if the request from unknown IP address. Double-click <b class="button">Condition</b> and new <em>Configure Rule</em>
+pop-up menu appears.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -1771,24 +1976,19 @@ we will have a diagram similar to below:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>You can fill in limit-req plugin config the following details in the Plugin Editor.</p>
+<p>You can fill in <code>ip-restriction</code> plugin config the following details in the Plugin Editor. Double-click on <b class="button">ip-restriction</b>, apply config and click <b class="button">Submit</b>.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="plugin-orchestration-configure-limit-req-screenshot.png" alt="plugin orchestration configure limit req screenshot">
+<img src="plugin-orchestration-configure-ip-restriction-config-screenshot.png" alt="plugin orchestration configure ip restriction config screenshot">
 </div>
 </div>
 <div class="paragraph">
-<p>To http-logger settings, we can just put our mock server uri address like below:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="json5">{&quot;uri&quot;: &quot;http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61&quot;}</code></pre>
-</div>
+<p>Similarly to <code>limit-count</code>:</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="plugin-orchestration-configure-http-logger-screenshot.png" alt="plugin orchestration configure http logger screenshot">
+<img src="plugin-orchestration-configure-limit-count-config-screenshot.png" alt="plugin orchestration configure limit count config screenshot">
 </div>
 </div>
 <div class="paragraph">
@@ -1800,7 +2000,7 @@ we will have a diagram similar to below:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-03-27 18:28:55 +0300
+Last updated 2022-04-02 14:36:01 +0300
 </div>
 </div>
 </body>
