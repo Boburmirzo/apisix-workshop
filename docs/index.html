@@ -685,6 +685,13 @@ Here, we have a single Upstream, so we can use any algorithm.</td>
 </tr>
 </table>
 </div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Apache APISIX Admin API provides a RESTful interface for the administration and configuration of Upstreams, Routes, Plugins, and Consumers. All the tasks you can perform against the Gateway can be automated using the <a href="https://apisix.apache.org/docs/apisix/admin-api">Admin API</a>.</p>
+</div>
+</div>
+</div>
 <div class="paragraph">
 <p>Once we have created the Route, we can check whether it works.
 Apache APISIX should forward the request to <a href="http://httpbin.org:80/anything/foo?arg=10" class="bare">http://httpbin.org:80/anything/foo?arg=10</a>.</p>
@@ -816,7 +823,10 @@ Now is time to test our configuration.</p>
 <h2 id="_apisix_dashboard">APISIX Dashboard</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Apache APISIX provides a <a href="https://github.com/apache/apisix-dashboard" target="_blank" rel="noopener">Dashboard</a> to make operating it more intuitive and more accessible.</p>
+<p>Apache APISIX is the first Open source API gateway, with a built-in low-code Dashboard offering a powerful and flexible interface for developers to use.</p>
+</div>
+<div class="paragraph">
+<p>The <a href="https://github.com/apache/apisix-dashboard">Apache APISIX Dashboard</a> is designed to make it as easy as possible for users to operate Apache APISIX through a frontend interface.</p>
 </div>
 <div class="paragraph">
 <p>You can find more information about APISIX Dashboard in the <a href="https://apisix.apache.org/docs/dashboard/USER_GUIDE" target="_blank" rel="noopener">user guide</a>.</p>
@@ -841,6 +851,92 @@ It demos the same features we achieve here via the <abbr title="Command-Line Int
 <div class="paragraph">
 <p>We created a new Route, Upstream, and mapped the former to the latter in the above steps.</p>
 </div>
+<div class="paragraph">
+<p>You can also try to create an Upstream, a Route and map them using the dashboard.</p>
+</div>
+<details>
+<summary class="title">Try it yourself</summary>
+<div class="content">
+<div class="paragraph">
+<p><strong>Create an Upstream</strong></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Access your dashboard instance running on the address <a href="http://localhost:9000/" class="bare">http://localhost:9000/</a> and
+login with default credentials <code>admin</code>/<code>admin</code>.</p>
+</li>
+<li>
+<p>Go to <strong>Upstream</strong> &gt; <strong>Upstream List</strong>.</p>
+</li>
+<li>
+<p>Click <b class="button">Create</b> to add new Upstream.</p>
+</li>
+<li>
+<p>For this example, enter example_upstream in the <strong>Name</strong> field.</p>
+</li>
+<li>
+<p>Scroll down and in the <strong>Target</strong> field, specify httpbin.org with port 80.</p>
+</li>
+<li>
+<p>Keep other fields as default.</p>
+</li>
+<li>
+<p>Scroll down and click <b class="button">Next</b>.</p>
+</li>
+<li>
+<p>Review and click <b class="button">Submit</b>.</p>
+</li>
+<li>
+<p>On the <strong>Upstreams</strong> page, you can see the new upstream service and click <b class="button">View</b> to see Raw data of configuration.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong>Create a Route and bind it to the upstream from previous steps.</strong></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Go to <strong>Route</strong> &gt; <strong>Route List</strong>.</p>
+</li>
+<li>
+<p>Click <b class="button">Create</b> to add new Route.</p>
+</li>
+<li>
+<p>Enter example_route in the <strong>Name</strong> field.</p>
+</li>
+<li>
+<p>Scroll down and in the <strong>Path</strong> field, specify URI "/get".</p>
+</li>
+<li>
+<p>In the <strong>HTTP Method</strong> field, keep only GET and remove others.</p>
+</li>
+<li>
+<p>Keep other fields as default.</p>
+</li>
+<li>
+<p>Scroll down and click <b class="button">Next</b>.</p>
+</li>
+<li>
+<p>In the next page, <strong>Define API Backend Server</strong> section, you can select only example_upstream in the Select Upstream field from dropdown menu.</p>
+</li>
+<li>
+<p>Scroll down and click <b class="button">Next</b>.</p>
+</li>
+<li>
+<p>No need to enable plugin at this stage, click simply <b class="button">Next</b></p>
+</li>
+<li>
+<p>Review and click <b class="button">Submit</b>.</p>
+</li>
+<li>
+<p>On the <strong>Routes</strong> page, you can see the new route and click <b class="button">View</b> to see Raw data of configuration.</p>
+</li>
+</ol>
+</div>
+</div>
+</details>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -2039,7 +2135,7 @@ pop-up menu appears.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-04 11:33:45 +0300
+Last updated 2022-04-04 17:20:29 +0300
 </div>
 </div>
 </body>

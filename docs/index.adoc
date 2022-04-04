@@ -114,6 +114,11 @@ every URI starting with `/anything/` matches.
 Upstream references a cluster of nodes, which you can balance load across, depending on some algorithm.
 Here, we have a single Upstream, so we can use any algorithm.
 
+[INFO]
+====
+Apache APISIX Admin API provides a RESTful interface for the administration and configuration of Upstreams, Routes, Plugins, and Consumers. All the tasks you can perform against the Gateway can be automated using the https://apisix.apache.org/docs/apisix/admin-api[Admin API].
+====
+
 Once we have created the Route, we can check whether it works.
 Apache APISIX should forward the request to http://httpbin.org:80/anything/foo?arg=10.
 
@@ -199,7 +204,9 @@ It should return the expected data from the configured Upstream.
 
 == APISIX Dashboard
 
-Apache APISIX provides a https://github.com/apache/apisix-dashboard[Dashboard^] to make operating it more intuitive and more accessible.
+Apache APISIX is the first Open source API gateway, with a built-in low-code Dashboard offering a powerful and flexible interface for developers to use.
+
+The https://github.com/apache/apisix-dashboard[Apache APISIX Dashboard] is designed to make it as easy as possible for users to operate Apache APISIX through a frontend interface.
 
 You can find more information about APISIX Dashboard in the https://apisix.apache.org/docs/dashboard/USER_GUIDE[user guide^].
 
@@ -213,6 +220,41 @@ It demos the same features we achieve here via the +++<abbr title="Command-Line 
 
 We created a new Route, Upstream, and mapped the former to the latter in the above steps.
 
+You can also try to create an Upstream, a Route and map them using the dashboard.
+
+.Try it yourself
+[%collapsible]
+====
+
+*Create an Upstream*
+
+1. Access your dashboard instance running on the address http://localhost:9000/ and
+login with default credentials `admin`/`admin`.
+2. Go to *Upstream* > *Upstream List*.
+3. Click btn:[Create] to add new Upstream.
+4. For this example, enter example_upstream in the *Name* field.
+5. Scroll down and in the *Target* field, specify httpbin.org with port 80.
+6. Keep other fields as default.
+7. Scroll down and click btn:[Next].
+8. Review and click btn:[Submit].
+9. On the *Upstreams* page, you can see the new upstream service and click btn:[View] to see Raw data of configuration.
+
+*Create a Route and bind it to the upstream from previous steps.*
+
+1. Go to *Route* > *Route List*.
+2. Click btn:[Create] to add new Route.
+3. Enter example_route in the *Name* field.
+4. Scroll down and in the *Path* field, specify URI "/get".
+5. In the *HTTP Method* field, keep only GET and remove others.
+6. Keep other fields as default.
+7. Scroll down and click btn:[Next].
+8. In the next page, *Define API Backend Server* section, you can select only example_upstream in the Select Upstream field from dropdown menu.
+9. Scroll down and click btn:[Next].
+10. No need to enable plugin at this stage, click simply btn:[Next]
+11. Review and click btn:[Submit].
+12. On the *Routes* page, you can see the new route and click btn:[View] to see Raw data of configuration.
+
+====
 [NOTE]
 ====
 We can achieve the same configuration result with the +++<abbr title="Command-Line Interface">CLI</abbr>+++ as with the Dashboard.
