@@ -104,13 +104,14 @@ curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f
 <3> Because configuration is a highly critical feature, we need to authenticate via an API key.
 Here, we use the default one.
 It's highly advised to generate your own, and regularly change it.
+To update your Admin API token, please refer to https://apisix.apache.org/docs/apisix/how-to-build#step-5-update-admin-api-token-to-secure-apache-apisix[this guide^].
 <4> HTTP method matching the newly-defined route
 <5> Host matching the newly-defined route
 <6> URI matching the newly-defined route.
 Notice the star character:
 every URI starting with `/anything/` matches.
 <7> Upstream defined at the same time as the Route.
-An Upstream references a cluster of nodes, which you can balance load across, depending on some algorithm.
+Upstream references a cluster of nodes, which you can balance load across, depending on some algorithm.
 Here, we have a single Upstream, so we can use any algorithm.
 
 Once we have created the Route, we can check whether it works.
