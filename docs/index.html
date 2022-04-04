@@ -738,24 +738,62 @@ With the help of the <a href="https://apisix.apache.org/docs/apisix/architecture
 </div>
 </div>
 </details>
+<div class="paragraph">
+<p>Also, you can configure the Upstream with additional properties like
+health check, retries, retry timeout or load-balancing to multiple systems.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>You can learn more about other Admin API Upstream request methods
+<a href="https://apisix.apache.org/docs/apisix/plugins/zipkin" target="_blank" rel="noopener">here</a>.</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_bind_the_route_to_the_upstream">Bind the Route to the Upstream</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In the above section, we created an Upstream (referencing our backend);
-now, let&#8217;s bind a Route for it.</p>
+<p>In the above section, we created an Upstream (referencing our backend).
+It can be referenced by <code>upstream_id</code> in a specific Route or Service.</p>
+</div>
+<div class="paragraph">
+<p>Now, let&#8217;s bind a Route for it.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl &quot;http://127.0.0.1:9080/apisix/admin/routes/1&quot; -H &quot;X-API-KEY: edd1c9f034335f136f87ad84b625c8f1&quot; -X PUT -d '
 {
-  &quot;uri&quot;: &quot;/get&quot;,
-  &quot;host&quot;: &quot;httpbin.org&quot;,
-  &quot;upstream_id&quot;: &quot;1&quot;
+  &quot;uri&quot;: &quot;/get&quot;, <i class="conum" data-value="1"></i><b>(1)</b>
+  &quot;host&quot;: &quot;httpbin.org&quot;, <i class="conum" data-value="2"></i><b>(2)</b>
+  &quot;upstream_id&quot;: &quot;1&quot; <i class="conum" data-value="3"></i><b>(3)</b>
 }'</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>In the Route request body, we are specifying following:</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Any requests to path <code>"/get"</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Host that matches domain name <code>"httpbin.org"</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Will be forwarded to the upstream target (backend service) instead of the host.
+For the purposes of our example, the upstream will point to target, <em>httpbin.org</em>. In a real environment, the upstream will point to the same service running on multiple systems.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>By creating an Upstream object and referencing it by upstream_id in the Route, you can ensure that there is only a single value of the object that needs to be maintained.</p>
 </div>
 <div class="sect2">
 <h3 id="_validation">Validation</h3>
@@ -2001,7 +2039,7 @@ pop-up menu appears.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-04 10:37:46 +0300
+Last updated 2022-04-04 11:33:45 +0300
 </div>
 </div>
 </body>
