@@ -91,8 +91,6 @@ services:
       - ./prometheus_conf/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-    depends_on:
-      - apisix
     networks:
       apisix:
 
@@ -101,8 +99,6 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    depends_on:
-      - prometheus
     volumes:
       - "./grafana_conf/provisioning:/etc/grafana/provisioning"
       - "./grafana_conf/dashboards:/var/lib/grafana/dashboards"
