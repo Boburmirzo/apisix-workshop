@@ -44,6 +44,7 @@ etcd:
 
 plugins:
  - zipkin
+ - key-auth
 plugin_attr:
   prometheus:
     export_addr:
