@@ -83,21 +83,14 @@ When Apache APISIX receives a request matching the Route, it forwards it to the 
 
 The following command creates a sample Route:
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f136f87ad84b625c8f1" -X PUT -d '  <1><2><3>
-{
-  "methods": ["GET"],                     <4>
-  "host": "example.com",                  <5>
-  "uri": "/anything/*",                   <6>
-  "upstream": {                           <7>
-    "type": "roundrobin",
-    "nodes": {
-      "httpbin.org:80": 1
-    }
-  }
-}'
+include::../cmds/1_create_route.sh[]
 ----
+====
 
 <1> The configuration of Apache APISIX objects is handled via a REST API
 <2> The `/apisix/admin/routes` endpoint manages Routes
@@ -122,10 +115,14 @@ Apache APISIX Admin API provides a RESTful interface for the administration and 
 Once we have created the Route, we can check whether it works.
 Apache APISIX should forward the request to http://httpbin.org:80/anything/foo?arg=10.
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-curl -i -X GET "http://127.0.0.1:9080/anything/foo?arg=10" -H "Host: example.com"
+include::../cmds/2_created_route_test.sh[]
 ----
+====
 
 == Create an Upstream
 
@@ -145,13 +142,7 @@ With the help of the https://apisix.apache.org/docs/apisix/architecture-design/u
 ====
 [source,bash]
 ----
-curl "http://127.0.0.1:9080/apisix/admin/upstreams/1" -H "X-API-KEY: edd1c9f034335f136f87ad84b625c8f1" -X PUT -d '
-{
-  "type": "roundrobin",
-  "nodes": {
-    "httpbin.org:80": 1
-  }
-}'
+include::../cmds/3_create_upstream.sh[]
 ----
 ====
 
@@ -171,15 +162,14 @@ It can be referenced by `upstream_id` in a specific Route or Service.
 
 Now, let's bind a Route for it.
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-curl "http://127.0.0.1:9080/apisix/admin/routes/1" -H "X-API-KEY: edd1c9f034335f136f87ad84b625c8f1" -X PUT -d '
-{
-  "uri": "/get", <1>
-  "host": "httpbin.org", <2>
-  "upstream_id": "1" <3>
-}'
+include::../cmds/4_bind_route_to_upstream.sh[]
 ----
+====
 
 In the Route request body, we are specifying following:
 
@@ -195,10 +185,14 @@ By creating an Upstream object and referencing it by upstream_id in the Route, y
 At this point, we have created a Route and an Upstream and bound them together.
 Now is time to test our configuration.
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-curl -i -X GET "http://127.0.0.1:9080/get?foo1=bar1&foo2=bar2" -H "Host: httpbin.org"
+include::../cmds/5_bind_route_to_upstream_test.sh[]
 ----
+====
 
 It should return the expected data from the configured Upstream.
 
@@ -285,7 +279,22 @@ Likewise, the Dashboard displays our sample Upstream.
 
 image::upstream-list-screenshot.png[]
 
-Click on btn:[Create], and give the Consumer a name, e.g., `Example Consumer`.
+First, we will enable `key-auth` plugin for the route. To do that:
+
+Navigate to btn:[Route], click btn:[Configure] and skip
+*Define API Backend Server* section and open *Plugin Config*
+
+image::key-auth-plugin-enable-route.png[]
+
+In this section, you can find `key-auth` plugin and click btn:[Enable].
+Request raw data you can keep as empty and push the toggle switch on.
+
+image::key-auth-plugin-switch-on.png[]
+
+Then press btn:[Submit] to save changes, click btn:[Next] and after btn:[Submit]
+to update route configs.
+
+Second, go to btn:[Consumer] page from the navigation bar and click on btn:[Create], then give the Consumer a name, e.g., `Example Consumer`.
 Click btn:[Next].
 
 image::create-new-consumer-screenshot.png[]
@@ -324,10 +333,14 @@ Any request that does not include a valid API key will be rejected with an HTTP 
 
 To prove it, let's move back to the terminal and run below curl command.
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
- curl -i -X GET http://127.0.0.1:9080/get"
+include::../cmds/6_authentication_enable_failed_test.sh[]
 ----
+====
 
 Because we didn't set the authentication key, Apache APISIX will return an unauthorized error.
 
@@ -348,10 +361,14 @@ Server: APISIX/2.12.1
 
 We can retry the same request with the authentication key.
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-curl -i -X GET http://127.0.0.1:9080/get -H "apikey: key-of-john"
+include::../cmds/7_authentication_enable_success_test.sh[]
 ----
+====
 
 We can now successfully access the endpoint!
 
@@ -410,24 +427,21 @@ It means that developers do not have to add any code to process the authenticati
 ====
 We need to disable the `key-auth` plugin we previously enabled to use another authentication plugin.
 Disabling is possible via the Dashboard or the CLI.
+
+image::disable-key-auth-plugin.png[]
 ====
 
 Let's apply the JWT plugin to our existing API.
 We update the existing `Consumer` plugin config with JWT-related configuration:
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
-{
-    "username": "example_consumer",
-    "plugins": {
-        "jwt-auth": {
-            "key": "user-key",
-            "secret": "my-secret-key"
-        }
-    }
-}'
+include::../cmds/8_update_consumer_jwt_credentials.sh[]
 ----
+====
 
 The response will look something like this:
 

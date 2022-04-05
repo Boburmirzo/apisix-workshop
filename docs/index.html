@@ -630,6 +630,9 @@ When Apache APISIX receives a request matching the Route, it forwards it to the 
 <div class="paragraph">
 <p>The following command creates a sample Route:</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl &quot;http://127.0.0.1:9080/apisix/admin/routes/1&quot; -H &quot;X-API-KEY: edd1c9f034335f136f87ad84b625c8f1&quot; -X PUT -d '  <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="3"></i><b>(3)</b>
@@ -646,6 +649,8 @@ When Apache APISIX receives a request matching the Route, it forwards it to the 
 }'</code></pre>
 </div>
 </div>
+</div>
+</details>
 <div class="colist arabic">
 <table>
 <tr>
@@ -696,11 +701,16 @@ Here, we have a single Upstream, so we can use any algorithm.</td>
 <p>Once we have created the Route, we can check whether it works.
 Apache APISIX should forward the request to <a href="http://httpbin.org:80/anything/foo?arg=10" class="bare">http://httpbin.org:80/anything/foo?arg=10</a>.</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET &quot;http://127.0.0.1:9080/anything/foo?arg=10&quot; -H &quot;Host: example.com&quot;</code></pre>
 </div>
 </div>
+</div>
+</details>
 </div>
 </div>
 </div>
@@ -769,6 +779,9 @@ It can be referenced by <code>upstream_id</code> in a specific Route or Service.
 <div class="paragraph">
 <p>Now, let&#8217;s bind a Route for it.</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl &quot;http://127.0.0.1:9080/apisix/admin/routes/1&quot; -H &quot;X-API-KEY: edd1c9f034335f136f87ad84b625c8f1&quot; -X PUT -d '
@@ -779,6 +792,8 @@ It can be referenced by <code>upstream_id</code> in a specific Route or Service.
 }'</code></pre>
 </div>
 </div>
+</div>
+</details>
 <div class="paragraph">
 <p>In the Route request body, we are specifying following:</p>
 </div>
@@ -808,11 +823,16 @@ For the purposes of our example, the upstream will point to target, <em>httpbin.
 <p>At this point, we have created a Route and an Upstream and bound them together.
 Now is time to test our configuration.</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET &quot;http://127.0.0.1:9080/get?foo1=bar1&amp;foo2=bar2&quot; -H &quot;Host: httpbin.org&quot;</code></pre>
 </div>
 </div>
+</div>
+</details>
 <div class="paragraph">
 <p>It should return the expected data from the configured Upstream.</p>
 </div>
@@ -991,7 +1011,32 @@ Likewise, the Dashboard displays our sample Upstream.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Click on <b class="button">Create</b>, and give the Consumer a name, e.g., <code>Example Consumer</code>.
+<p>First, we will enable <code>key-auth</code> plugin for the route. To do that:</p>
+</div>
+<div class="paragraph">
+<p>Navigate to <b class="button">Route</b>, click <b class="button">Configure</b> and skip
+<strong>Define API Backend Server</strong> section and open <strong>Plugin Config</strong></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="key-auth-plugin-enable-route.png" alt="key auth plugin enable route">
+</div>
+</div>
+<div class="paragraph">
+<p>In this section, you can find <code>key-auth</code> plugin and click <b class="button">Enable</b>.
+Request raw data you can keep as empty and push the toggle switch on.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="key-auth-plugin-switch-on.png" alt="key auth plugin switch on">
+</div>
+</div>
+<div class="paragraph">
+<p>Then press <b class="button">Submit</b> to save changes, click <b class="button">Next</b> and <b class="button">Submit</b>
+to update route configs.</p>
+</div>
+<div class="paragraph">
+<p>Second, go to <b class="button">Consumer</b> page from the navigation bar and click on <b class="button">Create</b>, then give the Consumer a name, e.g., <code>Example Consumer</code>.
 Click <b class="button">Next</b>.</p>
 </div>
 <div class="imageblock">
@@ -1052,11 +1097,16 @@ Any request that does not include a valid API key will be rejected with an HTTP 
 <div class="paragraph">
 <p>To prove it, let&#8217;s move back to the terminal and run below curl command.</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash"> curl -i -X GET http://127.0.0.1:9080/get&quot;</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET &quot;http://127.0.0.1:9080/get&quot; -H &quot;Host: httpbin.org&quot;</code></pre>
 </div>
 </div>
+</div>
+</details>
 <div class="paragraph">
 <p>Because we didn&#8217;t set the authentication key, Apache APISIX will return an unauthorized error.</p>
 </div>
@@ -1078,11 +1128,16 @@ Server: APISIX/2.12.1
 <div class="paragraph">
 <p>We can retry the same request with the authentication key.</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET http://127.0.0.1:9080/get -H &quot;apikey: key-of-john&quot;</code></pre>
 </div>
 </div>
+</div>
+</details>
 <div class="paragraph">
 <p>We can now successfully access the endpoint!</p>
 </div>
@@ -1180,6 +1235,9 @@ Disabling is possible via the Dashboard or the CLI.</p>
 <p>Let&#8217;s apply the JWT plugin to our existing API.
 We update the existing <code>Consumer</code> plugin config with JWT-related configuration:</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
@@ -1194,6 +1252,8 @@ We update the existing <code>Consumer</code> plugin config with JWT-related conf
 }'</code></pre>
 </div>
 </div>
+</div>
+</details>
 <div class="paragraph">
 <p>The response will look something like this:</p>
 </div>
@@ -2135,7 +2195,7 @@ pop-up menu appears.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-04 17:20:29 +0300
+Last updated 2022-04-05 15:29:31 +0300
 </div>
 </div>
 </body>
