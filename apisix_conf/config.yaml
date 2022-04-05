@@ -43,8 +43,19 @@ etcd:
   timeout: 30                     # 30 seconds
 
 plugins:
- - zipkin
- - key-auth
+  - http-logger
+  - ip-restriction
+  - jwt-auth
+  - key-auth
+  - limit-conn
+  - limit-count
+  - limit-req
+  - prometheus
+  - serverless-post-function
+  - serverless-pre-function
+  - zipkin
+  - traffic-split
+  - azure-functions
 plugin_attr:
   prometheus:
     export_addr:
