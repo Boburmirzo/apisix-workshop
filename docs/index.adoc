@@ -445,25 +445,68 @@ include::../cmds/8_update_consumer_jwt_credentials.sh[]
 
 The response will look something like this:
 
-image::jwt-add-consumer-screenshot.png[]
+[source,json5]
+----
+{
+  "node": {
+    "key": "/apisix/consumers/example_consumer",
+    "value": {
+      "create_time": 1649158467,
+      "username": "example_consumer",
+      "update_time": 1649163154,
+      "plugins": {
+        "jwt-auth": {
+          "base64_secret": false,
+          "secret": "my-secret-key",
+          "algorithm": "HS256",
+          "key": "user-key",
+          "exp": 86400
+        }
+      }
+    }
+  },
+  "action": "set"
+}
+----
 
 We can now add the `jwt-auth` plugin to the Route we have created previously:
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-
-curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
-{
-    "methods": ["GET"],
-    "uri": "/get",
-    "plugins": {
-        "jwt-auth": {}
-    },
-    "upstream_id": "1"
-}'
+include::../cmds/8_add_jwt_plugin_to_route.sh[]
 ----
+====
 
-image::jwt-enable-plugin-route-screenshot.png[]
+Response:
+
+[source,json5]
+----
+{
+  "node": {
+    "key": "/apisix/routes/1",
+    "value": {
+      "upstream_id": "1",
+      "uri": "/get",
+      "create_time": 1648567195,
+      "status": 1,
+      "id": "1",
+      "plugins": {
+        "jwt-auth": {}
+      },
+      "priority": 0,
+      "methods": [
+        "GET"
+      ],
+      "update_time": 1649163340
+    }
+  },
+  "action": "set"
+}
+
+----
 
 ==== Test Plugin
 
@@ -478,35 +521,71 @@ Please check the https://apisix.apache.org/docs/apisix/plugins/jwt-auth#:~:text=
 
 Run the following command to generate a new JWT token:
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-curl http://127.0.0.1:9080/apisix/plugin/jwt/sign?key=user-key -i
+include::../cmds/8_jwt_plugin_generate_token.sh[]
 ----
+====
 
 Apache APISIX returns a token:
 
-image::jwt-token-generated-screenshot.png[]
+[source,text]
+----
+HTTP/1.1 200 OK
+Date: Tue, 05 Apr 2022 12:57:34 GMT
+Content-Type: text/plain; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: APISIX/2.12.1
+
+<GENERATED_TOKEN>
+----
 
 We can use the newly-generated token to authenticate our next request:
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-curl -i -X GET http://127.0.0.1:9080/get -H 'Authorization: <SET_GENERATED_TOKEN>'
+include::../cmds/8_jwt_plugin_in_use.sh[]
 ----
+====
 
 Output with token:
 
-image::access-endpoint-with-generated-token.png[]
+[source,text]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 454
+Connection: keep-alive
+Date: Tue, 05 Apr 2022 13:02:30 GMT
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Server: APISIX/2.12.1
+----
 
 If you try to access the same endpoint without a token in the Header request, you will get HTTP Error _401 Unauthorized:
+
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-curl -i -X GET http://127.0.0.1:9080/get
+include::../cmds/8_jwt_plugin_failure_example.sh[]
 ----
+====
 
 Output without token:
 
-image::access-without-jwt-token-screenshot.png[]
+[source,json5]
+----
+{ "message": "Missing JWT token in request" }
+----
 
 We have validated the client's identity attempting to request by using various https://apisix.apache.org/docs/apisix/plugins/key-auth[authentication plugins] with the help of Apache APISIX.
 

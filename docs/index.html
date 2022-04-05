@@ -1032,7 +1032,7 @@ Request raw data you can keep as empty and push the toggle switch on.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Then press <b class="button">Submit</b> to save changes, click <b class="button">Next</b> and <b class="button">Submit</b>
+<p>Then press <b class="button">Submit</b> to save changes, click <b class="button">Next</b> and after <b class="button">Submit</b>
 to update route configs.</p>
 </div>
 <div class="paragraph">
@@ -1133,7 +1133,7 @@ Server: APISIX/2.12.1
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET http://127.0.0.1:9080/get -H &quot;apikey: key-of-john&quot;</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET &quot;http://127.0.0.1:9080/get&quot; -H &quot;Host: httpbin.org&quot; -H &quot;apikey: key-of-john&quot;</code></pre>
 </div>
 </div>
 </div>
@@ -1227,6 +1227,11 @@ It means that developers do not have to add any code to process the authenticati
 <p>We need to disable the <code>key-auth</code> plugin we previously enabled to use another authentication plugin.
 Disabling is possible via the Dashboard or the CLI.</p>
 </div>
+<div class="imageblock">
+<div class="content">
+<img src="disable-key-auth-plugin.png" alt="disable key auth plugin">
+</div>
+</div>
 </td>
 </tr>
 </table>
@@ -1257,14 +1262,36 @@ We update the existing <code>Consumer</code> plugin config with JWT-related conf
 <div class="paragraph">
 <p>The response will look something like this:</p>
 </div>
-<div class="imageblock">
+<div class="listingblock">
 <div class="content">
-<img src="jwt-add-consumer-screenshot.png" alt="jwt add consumer screenshot">
+<pre class="CodeRay highlight"><code data-lang="json5">{
+  &quot;node&quot;: {
+    &quot;key&quot;: &quot;/apisix/consumers/example_consumer&quot;,
+    &quot;value&quot;: {
+      &quot;create_time&quot;: 1649158467,
+      &quot;username&quot;: &quot;example_consumer&quot;,
+      &quot;update_time&quot;: 1649163154,
+      &quot;plugins&quot;: {
+        &quot;jwt-auth&quot;: {
+          &quot;base64_secret&quot;: false,
+          &quot;secret&quot;: &quot;my-secret-key&quot;,
+          &quot;algorithm&quot;: &quot;HS256&quot;,
+          &quot;key&quot;: &quot;user-key&quot;,
+          &quot;exp&quot;: 86400
+        }
+      }
+    }
+  },
+  &quot;action&quot;: &quot;set&quot;
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>We can now add the <code>jwt-auth</code> plugin to the Route we have created previously:</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
@@ -1278,9 +1305,34 @@ We update the existing <code>Consumer</code> plugin config with JWT-related conf
 }'</code></pre>
 </div>
 </div>
-<div class="imageblock">
+</div>
+</details>
+<div class="paragraph">
+<p>Response:</p>
+</div>
+<div class="listingblock">
 <div class="content">
-<img src="jwt-enable-plugin-route-screenshot.png" alt="jwt enable plugin route screenshot">
+<pre class="CodeRay highlight"><code data-lang="json5">{
+  &quot;node&quot;: {
+    &quot;key&quot;: &quot;/apisix/routes/1&quot;,
+    &quot;value&quot;: {
+      &quot;upstream_id&quot;: &quot;1&quot;,
+      &quot;uri&quot;: &quot;/get&quot;,
+      &quot;create_time&quot;: 1648567195,
+      &quot;status&quot;: 1,
+      &quot;id&quot;: &quot;1&quot;,
+      &quot;plugins&quot;: {
+        &quot;jwt-auth&quot;: {}
+      },
+      &quot;priority&quot;: 0,
+      &quot;methods&quot;: [
+        &quot;GET&quot;
+      ],
+      &quot;update_time&quot;: 1649163340
+    }
+  },
+  &quot;action&quot;: &quot;set&quot;
+}</code></pre>
 </div>
 </div>
 <div class="sect3">
@@ -1307,49 +1359,78 @@ Please check the <a href="https://apisix.apache.org/docs/apisix/plugins/jwt-auth
 <div class="paragraph">
 <p>Run the following command to generate a new JWT token:</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/plugin/jwt/sign?key=user-key -i</code></pre>
 </div>
 </div>
+</div>
+</details>
 <div class="paragraph">
 <p>Apache APISIX returns a token:</p>
 </div>
-<div class="imageblock">
+<div class="listingblock">
 <div class="content">
-<img src="jwt-token-generated-screenshot.png" alt="jwt token generated screenshot">
+<pre class="CodeRay highlight"><code data-lang="text">HTTP/1.1 200 OK
+Date: Tue, 05 Apr 2022 12:57:34 GMT
+Content-Type: text/plain; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: APISIX/2.12.1
+
+&lt;GENERATED_TOKEN&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>We can use the newly-generated token to authenticate our next request:</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET http://127.0.0.1:9080/get -H 'Authorization: &lt;SET_GENERATED_TOKEN&gt;'</code></pre>
 </div>
 </div>
+</div>
+</details>
 <div class="paragraph">
 <p>Output with token:</p>
 </div>
-<div class="imageblock">
+<div class="listingblock">
 <div class="content">
-<img src="access-endpoint-with-generated-token.png" alt="access endpoint with generated token">
+<pre class="CodeRay highlight"><code data-lang="text">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 454
+Connection: keep-alive
+Date: Tue, 05 Apr 2022 13:02:30 GMT
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Server: APISIX/2.12.1</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>If you try to access the same endpoint without a token in the Header request, you will get HTTP Error _401 Unauthorized:</p>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl -i -X GET http://127.0.0.1:9080/get</code></pre>
 </div>
 </div>
+</div>
+</details>
 <div class="paragraph">
 <p>Output without token:</p>
 </div>
-<div class="imageblock">
+<div class="listingblock">
 <div class="content">
-<img src="access-without-jwt-token-screenshot.png" alt="access without jwt token screenshot">
+<pre class="CodeRay highlight"><code data-lang="json5">{ &quot;message&quot;: &quot;Missing JWT token in request&quot; }</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2195,7 +2276,7 @@ pop-up menu appears.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-05 15:29:31 +0300
+Last updated 2022-04-05 16:07:19 +0300
 </div>
 </div>
 </body>
