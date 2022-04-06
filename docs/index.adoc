@@ -771,19 +771,14 @@ To http-logger settings, we can just put our mock server uri address like below:
 {"uri": "http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61"}
 ----
 
+.See the command
+[%collapsible]
+====
 [source,bash]
 ----
-curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
-{
-      "plugins": {
-            "http-logger": {
-                "uri": "http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61"
-            }
-       },
-      "upstream_id": "1",
-      "uri": "/get"
-}'
+include::../cmds/9_http_logger_plugin_enable.sh[]
 ----
+====
 
 You will get the following response:
 
@@ -828,6 +823,13 @@ We can send a request to this get endpoint to generate logs.
 [source,bash]
 ----
 curl -i http://127.0.0.1:9080/get
+----
+
+Next, access your mock server logs and check logs
+
+[source,http request]
+----
+https://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61/log
 ----
 
 As you can see, some recent logs are sent to our mock server:

@@ -1696,6 +1696,9 @@ You could generate a mock HTTP server at <a href="http://mockbin.org/bin/create"
 <pre class="CodeRay highlight"><code data-lang="json5">{&quot;uri&quot;: &quot;http://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61&quot;}</code></pre>
 </div>
 </div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
@@ -1710,6 +1713,8 @@ You could generate a mock HTTP server at <a href="http://mockbin.org/bin/create"
 }'</code></pre>
 </div>
 </div>
+</div>
+</details>
 <div class="paragraph">
 <p>You will get the following response:</p>
 </div>
@@ -1758,6 +1763,11 @@ You could generate a mock HTTP server at <a href="http://mockbin.org/bin/create"
 </div>
 <div class="paragraph">
 <p>As you can see, some recent logs are sent to our mock server:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="http request">https://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61/log</code></pre>
+</div>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -2276,7 +2286,7 @@ pop-up menu appears.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-05 16:07:19 +0300
+Last updated 2022-04-06 22:04:29 +0300
 </div>
 </div>
 </body>
