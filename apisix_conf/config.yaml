@@ -35,7 +35,7 @@ apisix:
   control:
     ip: "0.0.0.0"
     port: 9092
-
+  extra_lua_path: "/opt/?.lua"
 etcd:
   host:                           # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
     - "http://etcd:2379"     # multiple etcd address
@@ -56,6 +56,7 @@ plugins:
   - zipkin
   - traffic-split
   - azure-functions
+  - file-logger
 plugin_attr:
   prometheus:
     export_addr:
