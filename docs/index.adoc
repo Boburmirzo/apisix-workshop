@@ -1,5 +1,5 @@
 = Hands-on lab Apache APISIX
-Bobur Umurzokov <boburmirzo.umurzokov@gmail.com>
+Bobur Umurzokov <bumurzaqov2@gmail.com>
 :toc:
 :icons: font
 :experimental: true
@@ -33,18 +33,18 @@ You can also use other tools such as Postman for testing.
 
 == Install Apache APISIX
 
-Download the Docker image of Apache APISIX workshop sample.
+Download the Docker image of Apache APISIX.
 
 [source,bash^]
 ----
-git clone https://github.com/Boburmirzo/apisix-workshop.git
+git clone https://github.com/apache/apisix-docker.git
 ----
 
-Switch the current directory to the apisix-workshop path.
+Switch the current directory to the apisix-docker/example path.
 
 [source,bash^]
 ----
-cd apisix-workshop
+cd apisix-docker/example
 ----
 
 Run the docker-compose command to install Apache APISIX.
