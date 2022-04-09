@@ -1357,7 +1357,50 @@ Please check the <a href="https://apisix.apache.org/docs/apisix/plugins/jwt-auth
 </table>
 </div>
 <div class="paragraph">
-<p>Run the following command to generate a new JWT token:</p>
+<p>First, you need to set up the route for the API that signs the token, which will use the <a href="https://apisix.apache.org/docs/apisix/plugins/public-api/" target="_blank" rel="noopener">public-api</a> plugin.</p>
+</div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/routes/jas -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    &quot;uri&quot;: &quot;/apisix/plugin/jwt/sign&quot;,
+    &quot;plugins&quot;: {
+        &quot;public-api&quot;: {}
+    }
+}'</code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>Response:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json5">{
+  &quot;action&quot;: &quot;set&quot;,
+  &quot;node&quot;: {
+    &quot;key&quot;: &quot;/apisix/routes/jas&quot;,
+    &quot;value&quot;: {
+      &quot;status&quot;: 1,
+      &quot;priority&quot;: 0,
+      &quot;id&quot;: &quot;jas&quot;,
+      &quot;update_time&quot;: 1649490287,
+      &quot;plugins&quot;: {
+        &quot;public-api&quot;: {}
+      },
+      &quot;uri&quot;: &quot;/apisix/plugin/jwt/sign&quot;,
+      &quot;create_time&quot;: 1649490287
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, run the following command to generate a new JWT token:</p>
 </div>
 <details>
 <summary class="title">See the command</summary>
@@ -1762,12 +1805,15 @@ You could generate a mock HTTP server at <a href="http://mockbin.org/bin/create"
 </div>
 </div>
 <div class="paragraph">
-<p>As you can see, some recent logs are sent to our mock server:</p>
+<p>Next, access your mock server logs and check logs</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="http request">https://mockbin.org/bin/5451b7cd-af27-41b8-8df1-282ffea13a61/log</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>As you can see, some recent logs are sent to our mock server:</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -2286,7 +2332,7 @@ pop-up menu appears.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-06 22:04:29 +0300
+Last updated 2022-04-09 10:52:36 +0300
 </div>
 </div>
 </body>

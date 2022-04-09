@@ -519,7 +519,41 @@ If you use the RS256 algorithm, you must specify the algorithm and configure the
 Please check the https://apisix.apache.org/docs/apisix/plugins/jwt-auth#:~:text=jwt%2Dauth%20uses%20the%20HS256%20algorithm[documentation^] for more details.
 ====
 
-Run the following command to generate a new JWT token:
+First, you need to set up the route for the API that signs the token, which will use the https://apisix.apache.org/docs/apisix/plugins/public-api/[public-api^] plugin.
+
+.See the command
+[%collapsible]
+====
+[source,bash]
+----
+include::../cmds/8_jwt_plugin_enable_public-api-plugin.sh[]
+----
+====
+
+Response:
+
+[source,json5]
+----
+{
+  "action": "set",
+  "node": {
+    "key": "/apisix/routes/jas",
+    "value": {
+      "status": 1,
+      "priority": 0,
+      "id": "jas",
+      "update_time": 1649490287,
+      "plugins": {
+        "public-api": {}
+      },
+      "uri": "/apisix/plugin/jwt/sign",
+      "create_time": 1649490287
+    }
+  }
+}
+----
+
+Then, run the following command to generate a new JWT token:
 
 .See the command
 [%collapsible]
