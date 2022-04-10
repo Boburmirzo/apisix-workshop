@@ -1267,8 +1267,8 @@ Let's create new file-logger custom plugin. Users can use the file-logger plug-i
 
 Below the whole process of new plugin creation:
 
-* *Step 1.* Go to `/apisix-config folder` to modify `config.yaml`
-* *Step 2.* Setup `extra_lua_path` path to load your own plugin code. Add below line to
+* *Step 1.* Go to `/apisix-config` folder to modify `config.yaml`
+* *Step 2.* Setup `extra_lua_path` path to load our own plugin code. Add below line to
 under `apisix:` section in the config file:
 
 [source,yaml]
@@ -1300,20 +1300,73 @@ plugins:
 ----
 
 * *Step 4.* Next we create the `file-logger.lua` file in the apisix-workshop/file-logger-plugin/src directory
-and write a code to print as an output the plug-in configuration data and request-related data information to the APISIX `error.log` file use the following code to log:
-====
-[source,lua]
- core.log.warn(core.json.encode(conf))
- core.log.warn("ctx: ", core.json.encode(ctx, true))
-====
+and write a code to print as an output the plug-in configuration data and request-related data information to the APISIX `error.log` file. You can use the following code to log:
 
-.See the `file-logger.lua` file source code
+[source,lua]
+----
+core.log.warn(core.json.encode(conf))
+core.log.warn("ctx: ", core.json.encode(ctx, true))
+----
+
+The source code is located in `custom-plugin` folder in the project.
+
+.See the `file-logger.lua` plugin source code
 [%collapsible]
 ====
-[source,bash]
+
+[source,text]
 ----
-include::../custom-plugin/file-logger.lua[]
+local core         =   require("apisix.core") <1>
+
+local plugin_name = "file-logger" <2>
+
+local schema = { <3>
+    type = "object",
+    properties = {
+        path = {
+            type = "string"
+        },
+    },
+    required = {"path"}
+}
+
+
+local _M = { <4>
+    version = 1.0,
+    priority = 100,
+    name = plugin_name,
+    schema = schema,
+}
+
+function _M.check_schema(conf) <5>
+    local ok, err = core.schema.check(schema, conf)
+    if not ok then
+        return false, err
+    end
+
+    return true
+end
+
+function _M.log(conf, ctx) <6>
+    core.log.warn("conf: ", core.json.encode(conf))
+    core.log.warn("ctx: ", core.json.encode(ctx, true))
+end
+
+
+return _M
+
 ----
+<1> Import apisix core library to reuse built-in methods for the plugin schema validation, printing logs and encoding the input to JSON format.
+<2> Set a name of new custom plugin and later we pass the name to plugin config field.
+<3> Define plugin properties, in our case we have single required param _path_ where we command to plugin to create a log file in the given path.
+<4> _M is very important field in APISIX plugin development which affect the plugin's behavior. There, we can assign plugin version, name, priority, schema and other metadata information.
+<5> We override and implement the check_schema(conf) method to complete the plugin specification verification. Core library has provided the public method "core.schema.check", which can be used directly to complete JSON verification as well.
+We can also write our custom logic to validate the schema.
+<6> The code section shows how to implement any logic relevant to the plugin in the log phase and print some logs. Here, the _conf_ parameter is the relevant configuration information of the plugin, you can use _core.log.warn(core.json.encode(conf))_ to output it to _error.log_ for viewing. And the _ctx_ parameter caches data information related to the request. You can use _core.log.warn(core.json.encode(ctx, true))_ to output it to _error.log_ for viewing
+
+IMPORTANT: Before you introduce new plugin, always determine firstly its name and priority of the plugin. The priority of the new plugin cannot be same to any existing ones.
+Plugins with higher priority value will be executed first in a given phase.
+
 ====
 
 * *Step 5.* In the project root, open `docker-compose.yml` file and add the following volume info to mount `files-logger` plugin source code to docker:

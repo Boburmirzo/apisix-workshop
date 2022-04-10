@@ -2367,10 +2367,10 @@ For other languages, please review the documentation on <a href="https://apisix.
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Step 1.</strong> Go to <code>/apisix-config folder</code> to modify <code>config.yaml</code></p>
+<p><strong>Step 1.</strong> Go to <code>/apisix-config</code> folder to modify <code>config.yaml</code></p>
 </li>
 <li>
-<p><strong>Step 2.</strong> Setup <code>extra_lua_path</code> path to load your own plugin code. Add below line to
+<p><strong>Step 2.</strong> Setup <code>extra_lua_path</code> path to load our own plugin code. Add below line to
 under <code>apisix:</code> section in the config file:</p>
 </li>
 </ul>
@@ -2420,32 +2420,29 @@ under <code>apisix:</code> section in the config file:</p>
 <ul>
 <li>
 <p><strong>Step 4.</strong> Next we create the <code>file-logger.lua</code> file in the apisix-workshop/file-logger-plugin/src directory
-and write a code to print as an output the plug-in configuration data and request-related data information to the APISIX <code>error.log</code> file use the following code to log:</p>
+and write a code to print as an output the plug-in configuration data and request-related data information to the APISIX <code>error.log</code> file. You can use the following code to log:</p>
 </li>
 </ul>
 </div>
-<div class="exampleblock">
-<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="lua"> core.log.warn(core.json.encode(conf))
- core.log.warn(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">ctx: </span><span style="color:#710">&quot;</span></span>, core.json.encode(ctx, <span style="color:#069">true</span>))</code></pre>
+<pre class="CodeRay highlight"><code data-lang="lua">core.log.warn(core.json.encode(conf))
+core.log.warn(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">ctx: </span><span style="color:#710">&quot;</span></span>, core.json.encode(ctx, <span style="color:#069">true</span>))</code></pre>
 </div>
 </div>
-</div>
+<div class="paragraph">
+<p>The source code is located in <code>custom-plugin</code> folder in the project.</p>
 </div>
 <details>
-<summary class="title">See the <code>file-logger.lua</code> file source code</summary>
+<summary class="title">See the <code>file-logger.lua</code> plugin source code</summary>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">local core         =   require(&quot;apisix.core&quot;)
-local plugin       =   require(&quot;apisix.plugin&quot;)
-local ngx          =   ngx
+<pre class="CodeRay highlight"><code data-lang="text">local core         =   require(&quot;apisix.core&quot;) <i class="conum" data-value="1"></i><b>(1)</b>
 
-local plugin_name = &quot;file-logger&quot;
+local plugin_name = &quot;file-logger&quot; <i class="conum" data-value="2"></i><b>(2)</b>
 
-local schema = {
+local schema = { <i class="conum" data-value="3"></i><b>(3)</b>
     type = &quot;object&quot;,
     properties = {
         path = {
@@ -2456,14 +2453,14 @@ local schema = {
 }
 
 
-local _M = {
+local _M = { <i class="conum" data-value="4"></i><b>(4)</b>
     version = 1.0,
     priority = 100,
     name = plugin_name,
     schema = schema,
 }
 
-function _M.check_schema(conf)
+function _M.check_schema(conf) <i class="conum" data-value="5"></i><b>(5)</b>
     local ok, err = core.schema.check(schema, conf)
     if not ok then
         return false, err
@@ -2472,7 +2469,7 @@ function _M.check_schema(conf)
     return true
 end
 
-function _M.log(conf, ctx)
+function _M.log(conf, ctx) <i class="conum" data-value="6"></i><b>(6)</b>
     core.log.warn(&quot;conf: &quot;, core.json.encode(conf))
     core.log.warn(&quot;ctx: &quot;, core.json.encode(ctx, true))
 end
@@ -2480,6 +2477,48 @@ end
 
 return _M</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Import apisix core library to reuse built-in methods for the plugin schema validation, printing logs and encoding the input to JSON format.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set a name of new custom plugin and later we pass the name to plugin config field.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Define plugin properties, in our case we have single required param <em>path</em> where we command to plugin to create a log file in the given path.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>_M is very important field in APISIX plugin development which affect the plugin&#8217;s behavior. There, we can assign plugin version, name, priority, schema and other metadata information.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>We override and implement the check_schema(conf) method to complete the plugin specification verification. Core library has provided the public method "core.schema.check", which can be used directly to complete JSON verification as well.
+We can also write our custom logic to validate the schema.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The code section shows how to implement any logic relevant to the plugin in the log phase and print some logs. Here, the <em>conf</em> parameter is the relevant configuration information of the plugin, you can use <em>core.log.warn(core.json.encode(conf))</em> to output it to <em>error.log</em> for viewing. And the <em>ctx</em> parameter caches data information related to the request. You can use <em>core.log.warn(core.json.encode(ctx, true))</em> to output it to <em>error.log</em> for viewing</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Before you introduce new plugin, always determine firstly its name and priority of the plugin. The priority of the new plugin cannot be same to any existing ones.
+Plugins with higher priority value will be executed first in a given phase.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </details>
@@ -2693,7 +2732,7 @@ Please navigate to <a href="https://apisix.apache.org/docs/apisix/internal/testi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-10 16:14:35 +0300
+Last updated 2022-04-10 19:33:56 +0300
 </div>
 </div>
 </body>

@@ -1,6 +1,4 @@
 local core         =   require("apisix.core")
-local plugin       =   require("apisix.plugin")
-local ngx          =   ngx
 
 local plugin_name = "file-logger"
 
