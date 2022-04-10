@@ -480,6 +480,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_zipkin_plugin">Zipkin Plugin</a></li>
 <li><a href="#_serverless_plugin">Serverless Plugin</a></li>
 <li><a href="#_plugin_orchestration">Plugin Orchestration</a></li>
+<li><a href="#_plugin_development">Plugin Development</a></li>
 </ul>
 </li>
 </ul>
@@ -561,19 +562,19 @@ You can also use other tools such as Postman for testing.</p>
 <h2 id="_install_apache_apisix">Install Apache APISIX</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Download the Docker image of Apache APISIX.</p>
+<p>Download the Docker image of Apache APISIX workshop example.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash^">git clone https://github.com/apache/apisix-docker.git</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash^">git clone https://github.com/Boburmirzo/apisix-workshop.git</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Switch the current directory to the apisix-docker/example path.</p>
+<p>Switch the current directory to the apisix-workshop path.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash^">cd apisix-docker/example</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash^">cd apisix-workshop</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2143,8 +2144,22 @@ Please, follow the tutorial to <a href="https://docs.microsoft.com/en-us/azure/a
 <p>For the purpose of demo, the Function app is running on this address
 <code><a href="https://apisix-gateway.azurewebsites.net/" class="bare">https://apisix-gateway.azurewebsites.net/</a></code></p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
 <div class="paragraph">
-<p>Let&#8217;s run the following cmd to enable <code>azure-functions</code> plugin:</p>
+<p>We need to only enable <a href="https://portal.azure.com/#@OnOffAppOU.onmicrosoft.com/resource/subscriptions/178fbd72-9758-4f8e-84e5-8d0a0ffa0fcd/resourcegroups/apisix/providers/Microsoft.Web/sites/apisix-gateway/functionsList" target="_blank" rel="noopener">apisix-gateway</a> HttpTrigger function from Azure Portal.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s run the following cmd to enable <code>azure-functions</code> plugin for the route:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2327,12 +2342,358 @@ pop-up menu appears.</p>
 <p>Finally, click <b class="button">Next</b> and <b class="button">Submit</b> the changes applied on the route.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_plugin_development">Plugin Development</h3>
+<div class="paragraph">
+<p>During technological selection in a project implementation, the most important consideration for the development team is whether the chosen product matches the team’s technology stack or not. Apache APISIX has been supporting customized plugins since the day it was born.</p>
+</div>
+<div class="paragraph">
+<p>A plugin is an important mechanism in APISIX API Gateway by using it, we can create high-performance systems under tight deadlines. With Apache APISIX we can write custom plugins in a programming language we are familiar with, including Lua, Python, Java, Go, PHP and more.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>In this demo, we will see simple example of a plugin development in Lua.
+For other languages, please review the documentation on <a href="https://apisix.apache.org/docs/apisix/external-plugin/" target="_blank" rel="noopener">External Plugins</a></p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s create new file-logger custom plugin. Users can use the file-logger plug-in to append JSON-formatted request and response data to log files, or push the Log data stream to a specified location given in the path.</p>
+</div>
+<div class="paragraph">
+<p>Below the whole process of new plugin creation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 1.</strong> Go to <code>/apisix-config folder</code> to modify <code>config.yaml</code></p>
+</li>
+<li>
+<p><strong>Step 2.</strong> Setup <code>extra_lua_path</code> path to load your own plugin code. Add below line to
+under <code>apisix:</code> section in the config file:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span style="color:#606">apisix</span>:
+ <span style="color:#F00;background-color:#FAA">...</span>
+ <span style="color:#606">extra_lua_path</span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">/opt/?.lua</span><span style="color:#710">&quot;</span></span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Please note if there is another existing plugin with the same name, new custom plugin code will be loaded instead of the built-in one, and you can use this way to override the builtin behavior if needed.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 3.</strong> In the same <code>config.yaml</code> file under <code>plugins</code> section, you can see all enabled plugins specified by their names:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span style="color:#606">plugins</span>:
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">http-logger</span></span>
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">ip-restriction</span></span>
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">jwt-auth</span></span>
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">key-auth</span></span>
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">limit-conn</span></span>
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">limit-count</span></span>
+  <span style="color:#F00;background-color:#FAA">.....</span>
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">files-logger // To enable our custom plugin, we add the plugin name to the end of list.</span></span></code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 4.</strong> Next we create the <code>file-logger.lua</code> file in the apisix-workshop/file-logger-plugin/src directory
+and write a code to print as an output the plug-in configuration data and request-related data information to the APISIX <code>error.log</code> file use the following code to log:</p>
+</li>
+</ul>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="lua"> core.log.warn(core.json.encode(conf))
+ core.log.warn(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">ctx: </span><span style="color:#710">&quot;</span></span>, core.json.encode(ctx, <span style="color:#069">true</span>))</code></pre>
+</div>
+</div>
+</div>
+</div>
+<details>
+<summary class="title">See the <code>file-logger.lua</code> file source code</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">local core         =   require(&quot;apisix.core&quot;)
+local plugin       =   require(&quot;apisix.plugin&quot;)
+local ngx          =   ngx
+
+local plugin_name = &quot;file-logger&quot;
+
+local schema = {
+    type = &quot;object&quot;,
+    properties = {
+        path = {
+            type = &quot;string&quot;
+        },
+    },
+    required = {&quot;path&quot;}
+}
+
+
+local _M = {
+    version = 1.0,
+    priority = 100,
+    name = plugin_name,
+    schema = schema,
+}
+
+function _M.check_schema(conf)
+    local ok, err = core.schema.check(schema, conf)
+    if not ok then
+        return false, err
+    end
+
+    return true
+end
+
+function _M.log(conf, ctx)
+    core.log.warn(&quot;conf: &quot;, core.json.encode(conf))
+    core.log.warn(&quot;ctx: &quot;, core.json.encode(ctx, true))
+end
+
+
+return _M</code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 5.</strong> In the project root, open <code>docker-compose.yml</code> file and add the following volume info to mount <code>files-logger</code> plugin source code to docker:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"><span style="color:#606">volumes</span>:
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">./apisix_log:/usr/local/apisix/logs</span></span>
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">./apisix_conf/config.yaml:/usr/local/apisix/conf/config.yaml:ro</span></span>
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">./file-logger-plugin/src:/opt/apisix/plugins:ro</span></span></code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 6.</strong> Enable the plugin for the route and test.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Up to now, we have already prepared <code>example_upstream</code> locally.
+We can setup new route with our new plugin enabled.</p>
+</div>
+<details>
+<summary class="title">See the command</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+  &quot;methods&quot;: [
+    &quot;GET&quot;
+  ],
+  &quot;uri&quot;: &quot;/get&quot;,
+  &quot;plugins&quot;: {
+    &quot;file-logger&quot;: {
+      &quot;path&quot;: &quot;logs/file.log&quot;
+    }
+  },
+  &quot;upstream_id&quot;: &quot;1&quot;
+}'</code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>Then you will see a status code of 200 with the response, indicating that the route has been successfully created.</p>
+</div>
+<details>
+<summary class="title">See the response</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json5">{
+  &quot;action&quot;: &quot;set&quot;,
+  &quot;node&quot;: {
+    &quot;value&quot;: {
+      &quot;upstream_id&quot;: &quot;1&quot;,
+      &quot;uri&quot;: &quot;/get&quot;,
+      &quot;priority&quot;: 0,
+      &quot;plugins&quot;: {
+        &quot;file-logger&quot;: {
+          &quot;path&quot;: &quot;logs/file.log&quot;
+        }
+      },
+      &quot;update_time&quot;: 1649529440,
+      &quot;status&quot;: 1,
+      &quot;methods&quot;: [
+        &quot;GET&quot;
+      ],
+      &quot;create_time&quot;: 1648567195,
+      &quot;id&quot;: &quot;1&quot;
+    },
+    &quot;key&quot;: &quot;/apisix/routes/1&quot;
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>In the <code>apisix_log/error.log</code> file there will be a record likely below in JSON format:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">ctx: {&quot;conf_type&quot;:&quot;route&quot;,&quot;conf_version&quot;:21998,&quot;conf_id&quot;
+.....
+conf: {&quot;path&quot;:&quot;logs\/file.log&quot;} while logging request
+.....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It can be seen that the path: <code>logs/file.log</code> we configured for the plugin as the conf parameter has been successfully saved. So far we have successfully created a minimal usable plugin that prints the data for the conf and ctx parameters in the log phase.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>We can directly run <code>apisix reload</code> command to reload the latest plugin code without restarting Apache APISIX.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can also try to write core functionality for the custom <code>file-logger</code> plugin,
+where the program can get the log output path from conf param, create/update the file with new logs.
+Please refer to <a href="https://apisix.apache.org/docs/apisix/plugin-develop/" target="_blank" rel="noopener">Apache APISIX Plug-in Development Guide</a> and <a href="https://www.tutorialspoint.com/lua/lua_file_io.htm" target="_blank" rel="noopener">Lua&#8217;s IO library</a> to learn how to implement it.</p>
+</div>
+<details>
+<summary class="title">See the full solution</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="lua"><span style="color:#080;font-weight:bold">local</span> <span style="color:#950">core</span>         =   require(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">apisix.core</span><span style="color:#710">&quot;</span></span>)
+<span style="color:#080;font-weight:bold">local</span> <span style="color:#950">plugin</span>       =   require(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">apisix.plugin</span><span style="color:#710">&quot;</span></span>)
+<span style="color:#080;font-weight:bold">local</span> <span style="color:#950">ngx</span>          =   ngx
+
+<span style="color:#080;font-weight:bold">local</span> <span style="color:#950">plugin_name</span> = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">file-logger</span><span style="color:#710">&quot;</span></span>
+
+<span style="color:#080;font-weight:bold">local</span> <span style="color:#950">schema</span> = <span style="background-color:hsla(200,100%,50%,0.06)"><span style="color:#40A">{</span>
+    <span style="color:#606">type</span> = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">object</span><span style="color:#710">&quot;</span></span>,
+    <span style="color:#606">properties</span> = <span style="background-color:hsla(200,100%,50%,0.06)"><span style="font-weight:bold;color:#666">{</span>
+        <span style="color:#606">path</span> = <span style="background-color:hsla(200,100%,50%,0.06)"><span style="font-weight:bold;color:#666">{</span>
+            <span style="color:#606">type</span> = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">string</span><span style="color:#710">&quot;</span></span>
+        <span style="font-weight:bold;color:#666">}</span></span>,
+    <span style="font-weight:bold;color:#666">}</span></span>,
+    <span style="color:#606">required</span> = <span style="background-color:hsla(200,100%,50%,0.06)"><span style="font-weight:bold;color:#666">{</span><span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">path</span><span style="color:#710">&quot;</span></span><span style="font-weight:bold;color:#666">}</span></span>
+<span style="color:#40A">}</span></span>
+
+
+<span style="color:#080;font-weight:bold">local</span> <span style="color:#950">_M</span> = <span style="background-color:hsla(200,100%,50%,0.06)"><span style="color:#40A">{</span>
+    <span style="color:#606">version</span> = <span style="color:#60E">1.0</span>,
+    <span style="color:#606">priority</span> = <span style="color:#00D">100</span>,
+    <span style="color:#606">name</span> = plugin_name,
+    <span style="color:#606">schema</span> = schema,
+<span style="color:#40A">}</span></span>
+
+<span style="color:#080;font-weight:bold">function</span> _M.<span style="color:#06B;font-weight:bold">check_schema</span>(conf)
+    <span style="color:#080;font-weight:bold">local</span> <span style="color:#950">ok</span>, <span style="color:#950">err</span> = core.schema.check(schema, conf)
+    <span style="color:#080;font-weight:bold">if</span> <span style="color:#080;font-weight:bold">not</span> ok <span style="color:#080;font-weight:bold">then</span>
+        <span style="color:#080;font-weight:bold">return</span> <span style="color:#069">false</span>, err
+    <span style="color:#080;font-weight:bold">end</span>
+
+    <span style="color:#080;font-weight:bold">return</span> <span style="color:#069">true</span>
+<span style="color:#080;font-weight:bold">end</span>
+
+<span style="color:#080;font-weight:bold">local</span> <span style="color:#080;font-weight:bold">function</span> <span style="color:#06B;font-weight:bold">write_file_data</span>(conf, log_message)
+    <span style="color:#080;font-weight:bold">local</span> <span style="color:#950">msg</span>, <span style="color:#950">err</span> = core.json.encode(log_message)
+    <span style="color:#080;font-weight:bold">if</span> err <span style="color:#080;font-weight:bold">then</span>
+        <span style="color:#080;font-weight:bold">return</span> core.log.<span style="color:#369;font-weight:bold">error</span>(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">message json serialization failed, error info : </span><span style="color:#710">&quot;</span></span>, err)
+    <span style="color:#080;font-weight:bold">end</span>
+
+    <span style="color:#080;font-weight:bold">local</span> <span style="color:#950">file</span>, <span style="color:#950">err</span> = io_open(conf.path, <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">'</span><span style="color:#D20">a+</span><span style="color:#710">'</span></span>)
+
+    <span style="color:#080;font-weight:bold">if</span> <span style="color:#080;font-weight:bold">not</span> file <span style="color:#080;font-weight:bold">then</span>
+        core.log.<span style="color:#369;font-weight:bold">error</span>(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">failed to open file: </span><span style="color:#710">&quot;</span></span>, conf.path, <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">, error info: </span><span style="color:#710">&quot;</span></span>, err)
+    <span style="color:#080;font-weight:bold">else</span>
+        <span style="color:#080;font-weight:bold">local</span> <span style="color:#950">ok</span>, <span style="color:#950">err</span> = file:write(msg, <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">'</span><span style="color:#b0b">\n</span><span style="color:#710">'</span></span>)
+        <span style="color:#080;font-weight:bold">if</span> <span style="color:#080;font-weight:bold">not</span> ok <span style="color:#080;font-weight:bold">then</span>
+            core.log.<span style="color:#369;font-weight:bold">error</span>(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">failed to write file: </span><span style="color:#710">&quot;</span></span>, conf.path, <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">, error info: </span><span style="color:#710">&quot;</span></span>, err)
+        <span style="color:#080;font-weight:bold">else</span>
+            file:flush()
+        <span style="color:#080;font-weight:bold">end</span>
+        file:close()
+    <span style="color:#080;font-weight:bold">end</span>
+<span style="color:#080;font-weight:bold">end</span>
+
+<span style="color:#080;font-weight:bold">function</span> _M.<span style="color:#06B;font-weight:bold">log</span>(conf, ctx)
+    <span style="color:#080;font-weight:bold">local</span> <span style="color:#950">metadata</span> = plugin.plugin_metadata(plugin_name)
+    <span style="color:#080;font-weight:bold">local</span> <span style="color:#950">entry</span>
+
+    <span style="color:#080;font-weight:bold">if</span> metadata <span style="color:#080;font-weight:bold">and</span> metadata.value.log_format
+            <span style="color:#080;font-weight:bold">and</span> core.table.nkeys(metadata.value.log_format) &gt; <span style="color:#00D">0</span>
+    <span style="color:#080;font-weight:bold">then</span>
+        entry = log_util.get_custom_format_log(ctx, metadata.value.log_format)
+    <span style="color:#080;font-weight:bold">else</span>
+        entry = log_util.get_full_log(ngx, conf)
+    <span style="color:#080;font-weight:bold">end</span>
+
+    write_file_data(conf, entry)
+<span style="color:#080;font-weight:bold">end</span>
+
+
+<span style="color:#080;font-weight:bold">return</span> <span style="color:#369;font-weight:bold">_M</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>With Apache APISIX, you can also write tests to validate the behaviour of plugins.
+Please navigate to <a href="https://apisix.apache.org/docs/apisix/internal/testing-framework/">APISIX Testing Framework</a> for more details.</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-09 11:03:32 +0300
+Last updated 2022-04-10 16:14:35 +0300
 </div>
 </div>
 </body>

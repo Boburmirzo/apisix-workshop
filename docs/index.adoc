@@ -33,18 +33,18 @@ You can also use other tools such as Postman for testing.
 
 == Install Apache APISIX
 
-Download the Docker image of Apache APISIX.
+Download the Docker image of Apache APISIX workshop example.
 
 [source,bash^]
 ----
-git clone https://github.com/apache/apisix-docker.git
+git clone https://github.com/Boburmirzo/apisix-workshop.git
 ----
 
-Switch the current directory to the apisix-docker/example path.
+Switch the current directory to the apisix-workshop path.
 
 [source,bash^]
 ----
-cd apisix-docker/example
+cd apisix-workshop
 ----
 
 Run the docker-compose command to install Apache APISIX.
@@ -1120,7 +1120,12 @@ image::azure-function-exists-screentshot.png[]
 For the purpose of demo, the Function app is running on this address
 `https://apisix-gateway.azurewebsites.net/`
 
-Let's run the following cmd to enable `azure-functions` plugin:
+[NOTE]
+====
+We need to only enable https://portal.azure.com/#@OnOffAppOU.onmicrosoft.com/resource/subscriptions/178fbd72-9758-4f8e-84e5-8d0a0ffa0fcd/resourcegroups/apisix/providers/Microsoft.Web/sites/apisix-gateway/functionsList[apisix-gateway^] HttpTrigger function from Azure Portal.
+====
+
+Let's run the following cmd to enable `azure-functions` plugin for the route:
 
 [source,bash]
 ----
@@ -1246,3 +1251,160 @@ image::plugin-orchestration-configure-limit-count-config-screenshot.png[]
 
 Finally, click btn:[Next] and btn:[Submit] the changes applied on the route.
 
+=== Plugin Development
+
+During technological selection in a project implementation, the most important consideration for the development team is whether the chosen product matches the team’s technology stack or not. Apache APISIX has been supporting customized plugins since the day it was born.
+
+A plugin is an important mechanism in APISIX API Gateway by using it, we can create high-performance systems under tight deadlines. With Apache APISIX we can write custom plugins in a programming language we are familiar with, including Lua, Python, Java, Go, PHP and more.
+
+[INFO]
+====
+In this demo, we will see simple example of a plugin development in Lua.
+For other languages, please review the documentation on https://apisix.apache.org/docs/apisix/external-plugin/[External Plugins^]
+====
+
+Let's create new file-logger custom plugin. Users can use the file-logger plug-in to append JSON-formatted request and response data to log files, or push the Log data stream to a specified location given in the path.
+
+Below the whole process of new plugin creation:
+
+* *Step 1.* Go to `/apisix-config folder` to modify `config.yaml`
+* *Step 2.* Setup `extra_lua_path` path to load your own plugin code. Add below line to
+under `apisix:` section in the config file:
+
+[source,yaml]
+----
+apisix:
+ ...
+ extra_lua_path: "/opt/?.lua"
+----
+
+[NOTE]
+====
+Please note if there is another existing plugin with the same name, new custom plugin code will be loaded instead of the built-in one, and you can use this way to override the builtin behavior if needed.
+====
+
+* *Step 3.* In the same `config.yaml` file under `plugins` section, you can see all enabled plugins specified by their names:
+
+[source,yaml]
+----
+plugins:
+  - http-logger
+  - ip-restriction
+  - jwt-auth
+  - key-auth
+  - limit-conn
+  - limit-count
+  .....
+  - files-logger // To enable our custom plugin, we add the plugin name to the end of list.
+
+----
+
+* *Step 4.* Next we create the `file-logger.lua` file in the apisix-workshop/file-logger-plugin/src directory
+and write a code to print as an output the plug-in configuration data and request-related data information to the APISIX `error.log` file use the following code to log:
+====
+[source,lua]
+ core.log.warn(core.json.encode(conf))
+ core.log.warn("ctx: ", core.json.encode(ctx, true))
+====
+
+.See the `file-logger.lua` file source code
+[%collapsible]
+====
+[source,bash]
+----
+include::../custom-plugin/file-logger.lua[]
+----
+====
+
+* *Step 5.* In the project root, open `docker-compose.yml` file and add the following volume info to mount `files-logger` plugin source code to docker:
+
+[source,yaml]
+----
+volumes:
+  - ./apisix_log:/usr/local/apisix/logs
+  - ./apisix_conf/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+  - ./file-logger-plugin/src:/opt/apisix/plugins:ro
+----
+
+* *Step 6.* Enable the plugin for the route and test.
+
+Up to now, we have already prepared `example_upstream` locally.
+We can setup new route with our new plugin enabled.
+
+.See the command
+[%collapsible]
+====
+[source,bash]
+----
+include::../cmds/14_custom_file_logger_plugin_enable.sh[]
+----
+====
+
+Then you will see a status code of 200 with the response, indicating that the route has been successfully created.
+
+.See the response
+[%collapsible]
+====
+[source,json5]
+----
+{
+  "action": "set",
+  "node": {
+    "value": {
+      "upstream_id": "1",
+      "uri": "/get",
+      "priority": 0,
+      "plugins": {
+        "file-logger": {
+          "path": "logs/file.log"
+        }
+      },
+      "update_time": 1649529440,
+      "status": 1,
+      "methods": [
+        "GET"
+      ],
+      "create_time": 1648567195,
+      "id": "1"
+    },
+    "key": "/apisix/routes/1"
+  }
+}
+----
+====
+
+In the `apisix_log/error.log` file there will be a record likely below in JSON format:
+
+[source,text]
+----
+ctx: {"conf_type":"route","conf_version":21998,"conf_id"
+.....
+conf: {"path":"logs\/file.log"} while logging request
+.....
+----
+
+It can be seen that the path: `logs/file.log` we configured for the plugin as the conf parameter has been successfully saved. So far we have successfully created a minimal usable plugin that prints the data for the conf and ctx parameters in the log phase.
+
+[TIP]
+====
+We can directly run `apisix reload` command to reload the latest plugin code without restarting Apache APISIX.
+====
+
+You can also try to write core functionality for the custom `file-logger` plugin,
+where the program can get the log output path from conf param, create/update the file with new logs.
+Please refer to https://apisix.apache.org/docs/apisix/plugin-develop/[Apache APISIX Plug-in Development Guide^] and https://www.tutorialspoint.com/lua/lua_file_io.htm[Lua's IO library^] to learn how to implement it.
+
+.See the full solution
+[%collapsible]
+====
+[source,lua]
+----
+include::../custom-plugin/file-logger-full-solution.lua[]
+----
+====
+
+[INFO]
+====
+With Apache APISIX, you can also write tests to validate the behaviour of plugins.
+Please navigate to https://apisix.apache.org/docs/apisix/internal/testing-framework/[APISIX Testing Framework] for more details.
+====
