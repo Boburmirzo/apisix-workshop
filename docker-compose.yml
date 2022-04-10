@@ -34,9 +34,9 @@ services:
     volumes:
       - ./apisix_log:/usr/local/apisix/logs
       - ./apisix_conf/config.yaml:/usr/local/apisix/conf/config.yaml:ro
-      - ./file-logger-plugin/src:/opt/apisix/plugins:ro
     depends_on:
       - etcd
+    ##network_mode: host
     ports:
       - "9080:9080/tcp"
       - "9091:9091/tcp"
