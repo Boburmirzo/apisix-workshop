@@ -1828,7 +1828,7 @@ You could generate a mock HTTP server at <a href="http://mockbin.org/bin/create"
 <p>API monitoring is the process of collecting and analyzing data about the performance of an API to identify problems that impact users. If an application is running slowly, you must first understand the cause before you can correct it.</p>
 </div>
 <div class="paragraph">
-<p>Modern applications use many independent microservices instead of a few large ones, and one poor-performing service can adversely impact the overall performance of an application. In addition, isolating a single poor-performing service among hundreds can be a challenge unless proper monitoring is in place. This makes API monitoring and measuring API performance a crucial practice for modern multi-cloud environments.</p>
+<p>Metrics are a numeric representation of data measured over intervals of time. You can also aggregate this data into daily or weekly frequency and run queries against a distributed system like Elasticsearch. Or sometimes based on metrics you trigger alerts to take any action later. Once API metrics are collected, you can track them with metrics tracking tools such as Prometheus.</p>
 </div>
 <div class="exampleblock">
 <div class="content">
@@ -2095,7 +2095,38 @@ Server: APISIX/2.13.0
 </div>
 </div>
 <div class="paragraph">
+<p>As you can see, there are some additional trace identifiers (like traceId, spanId, parentId) were appended to the headers:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">    &quot;X-B3-Parentspanid&quot;: &quot;61bd3f4046a800e7&quot;,
+    &quot;X-B3-Sampled&quot;: &quot;1&quot;,
+    &quot;X-B3-Spanid&quot;: &quot;855cd5465957f414&quot;,
+    &quot;X-B3-Traceid&quot;: &quot;e18985df47dab632d62083fd96626692&quot;,</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>Then you can use a browser to access <a href="http://127.0.0.1:9411/zipkin" class="bare">http://127.0.0.1:9411/zipkin</a>, see traces on the Web UI of Zipkin</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You need to run the Zipkin instance in order to install Zipkin Web UI.
+For example, by using docker you can simply run it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="curl">docker run -d -p 9411:9411 openzipkin/zipkin</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -2732,7 +2763,7 @@ Please navigate to <a href="https://apisix.apache.org/docs/apisix/internal/testi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-10 19:33:56 +0300
+Last updated 2022-04-12 21:57:49 +0300
 </div>
 </div>
 </body>

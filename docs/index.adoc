@@ -1089,7 +1089,28 @@ Server: APISIX/2.13.0
 }
 ----
 
+As you can see, there are some additional trace identifiers (like traceId, spanId, parentId) were appended to the headers:
+
+[source,text]
+----
+    "X-B3-Parentspanid": "61bd3f4046a800e7",
+    "X-B3-Sampled": "1",
+    "X-B3-Spanid": "855cd5465957f414",
+    "X-B3-Traceid": "e18985df47dab632d62083fd96626692",
+----
+
 Then you can use a browser to access http://127.0.0.1:9411/zipkin, see traces on the Web UI of Zipkin
+
+[IMPORTANT]
+====
+You need to run the Zipkin instance in order to install Zipkin Web UI.
+For example, by using docker you can simply run it:
+
+[source,curl]
+----
+docker run -d -p 9411:9411 openzipkin/zipkin
+----
+====
 
 image::zipkin-output-screenshot-1.png[]
 
