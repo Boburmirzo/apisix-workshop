@@ -874,7 +874,7 @@ image::http-logger-plugin-test-screenshot.png[]
 
 API monitoring is the process of collecting and analyzing data about the performance of an API to identify problems that impact users. If an application is running slowly, you must first understand the cause before you can correct it.
 
-Modern applications use many independent microservices instead of a few large ones, and one poor-performing service can adversely impact the overall performance of an application. In addition, isolating a single poor-performing service among hundreds can be a challenge unless proper monitoring is in place. This makes API monitoring and measuring API performance a crucial practice for modern multi-cloud environments.
+Metrics are a numeric representation of data measured over intervals of time. You can also aggregate this data into daily or weekly frequency and run queries against a distributed system like Elasticsearch. Or sometimes based on metrics you trigger alerts to take any action later. Once API metrics are collected, you can track them with metrics tracking tools such as Prometheus.
 
 [INFO]
 ====
