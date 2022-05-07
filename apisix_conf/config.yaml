@@ -43,10 +43,12 @@ etcd:
   timeout: 30                     # 30 seconds
 
 plugins:
+  - public-api
   - http-logger
   - ip-restriction
   - jwt-auth
   - key-auth
+  - basic-auth
   - limit-conn
   - limit-count
   - limit-req
