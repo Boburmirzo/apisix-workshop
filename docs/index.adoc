@@ -27,7 +27,7 @@ We should learn a couple of core concepts before Apache APISIX work as per our n
 
 == Pre-requisites
 
-* Installed https://www.docker.com/[Docker^] and https://docs.docker.com/compose/[Docker Compose^] component.
+* Installed https://www.docker.com/[Docker^].
 * We use the https://curl.se/docs/manpage.html[curl^] command for API testing.
 You can also use other tools such as Postman for testing.
 
@@ -47,11 +47,11 @@ Switch the current directory to the apisix-workshop path.
 cd apisix-workshop
 ----
 
-Run the docker-compose command to install Apache APISIX.
+Run the `docker compose` command to install Apache APISIX.
 
 [source,bash]
 ----
-docker-compose -p docker-apisix up -d
+docker compose -p docker-apisix up -d
 ----
 
 Once the download is complete, execute the curl command on the host running Docker to access the Admin API, and determine if Apache APISIX was successfully started based on the returned data.
