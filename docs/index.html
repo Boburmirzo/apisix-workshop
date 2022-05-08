@@ -1657,13 +1657,24 @@ To do so, run the following command:</p>
 <div class="paragraph">
 <p>Output:</p>
 </div>
-<div class="imageblock">
+<div class="listingblock">
 <div class="content">
-<img src="limit-count-plugin-enable-screenshot.png" alt="limit count plugin enable screenshot">
+<pre class="CodeRay highlight"><code data-lang="text">HTTP/1.1 200 OK
+Date: Sun, 08 May 2022 10:50:40 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: APISIX/2.13.1
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: *
+Access-Control-Max-Age: 3600
+
+{&quot;action&quot;:&quot;set&quot;,&quot;node&quot;:{&quot;value&quot;:{&quot;update_time&quot;:1652007040,&quot;id&quot;:&quot;1&quot;,&quot;status&quot;:1,&quot;create_time&quot;:1648567195,&quot;priority&quot;:0,&quot;uri&quot;:&quot;\/get&quot;,&quot;plugins&quot;:{&quot;limit-count&quot;:{&quot;allow_degradation&quot;:false,&quot;time_window&quot;:60,&quot;show_limit_quota_header&quot;:true,&quot;rejected_code&quot;:503,&quot;policy&quot;:&quot;local&quot;,&quot;count&quot;:2,&quot;key&quot;:&quot;remote_addr&quot;,&quot;key_type&quot;:&quot;var&quot;}},&quot;upstream_id&quot;:&quot;1&quot;},&quot;key&quot;:&quot;\/apisix\/routes\/1&quot;}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The above configuration limits the number of requests to two in 60 seconds.
+<p>The above configuration limits the number of requests to <strong>two in 60 seconds</strong>.
 Apache APISIX will handle the first two requests as usual:</p>
 </div>
 <div class="listingblock">
@@ -1674,25 +1685,66 @@ Apache APISIX will handle the first two requests as usual:</p>
 <div class="paragraph">
 <p>A third request in the same period will return a 503 HTTP code:</p>
 </div>
-<div class="imageblock">
+<div class="listingblock">
 <div class="content">
-<img src="limit-count-plugin-enable-access-failed-screenshot.png" alt="limit count plugin enable access failed screenshot">
+<pre class="CodeRay highlight"><code data-lang="text">HTTP/1.1 503 Service Temporarily Unavailable
+Date: Sun, 08 May 2022 10:51:02 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 194
+Connection: keep-alive
+Server: APISIX/2.13.1
+
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;503 Service Temporarily Unavailable&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;center&gt;&lt;h1&gt;503 Service Temporarily Unavailable&lt;/h1&gt;&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;openresty&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You can configure the failure message with the <code>rejected_msg</code> attribute.
+<p>You can configure the failure HTTP Status <code>403 Forbidden</code> by configuring <code>rejected_code</code> and message with the <code>rejected_msg</code> attributes.
 For example, we can set it with <code>Requests are too frequent, please try again later</code>.
 After reaching the threshold, the response is akin to the following:</p>
 </div>
+<details>
+<summary class="title">See the example with custom rejection message:</summary>
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre>HTTP/1.1 503 Service Temporarily Unavailable
-Content-Type: text/html
-Content-Length: 194
+<pre class="CodeRay highlight"><code data-lang="bash">curl -i http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    &quot;uri&quot;: &quot;/get&quot;,
+    &quot;plugins&quot;: {
+        &quot;limit-count&quot;: {
+            &quot;count&quot;: 2,
+            &quot;time_window&quot;: 60,
+            &quot;rejected_code&quot;: 403,
+            &quot;rejected_msg&quot;: &quot;Requests are too frequent, please try again later.&quot;,
+            &quot;key_type&quot;: &quot;var&quot;,
+            &quot;key&quot;: &quot;remote_addr&quot;
+        }
+    },
+    &quot;upstream_id&quot;: &quot;1&quot;
+}'</code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>Result:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="text">HTTP/1.1 403 Forbidden
+Date: Sun, 08 May 2022 11:30:43 GMT
+Content-Type: text/plain; charset=utf-8
+Transfer-Encoding: chunked
 Connection: keep-alive
-Server: APISIX web server
+Server: APISIX/2.13.1
 
-{"error_msg":"Requests are too frequent, please try again later."}</pre>
+{&quot;error_msg&quot;:&quot;Requests are too frequent, please try again later.&quot;}</code></pre>
 </div>
 </div>
 <div class="exampleblock">
@@ -2763,7 +2815,7 @@ Please navigate to <a href="https://apisix.apache.org/docs/apisix/internal/testi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-05-07 11:39:05 +0300
+Last updated 2022-05-08 14:33:38 +0300
 </div>
 </div>
 </body>

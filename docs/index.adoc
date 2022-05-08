@@ -744,9 +744,23 @@ curl -i http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335
 
 Output:
 
-image::limit-count-plugin-enable-screenshot.png[]
+[source,text]
+----
+HTTP/1.1 200 OK
+Date: Sun, 08 May 2022 10:50:40 GMT
+Content-Type: application/json
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: APISIX/2.13.1
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: *
+Access-Control-Max-Age: 3600
 
-The above configuration limits the number of requests to two in 60 seconds.
+{"action":"set","node":{"value":{"update_time":1652007040,"id":"1","status":1,"create_time":1648567195,"priority":0,"uri":"\/get","plugins":{"limit-count":{"allow_degradation":false,"time_window":60,"show_limit_quota_header":true,"rejected_code":503,"policy":"local","count":2,"key":"remote_addr","key_type":"var"}},"upstream_id":"1"},"key":"\/apisix\/routes\/1"}}
+----
+
+The above configuration limits the number of requests to *two in 60 seconds*.
 Apache APISIX will handle the first two requests as usual:
 
 [source,bash]
@@ -756,18 +770,61 @@ curl -i http://127.0.0.1:9080/get
 
 A third request in the same period will return a 503 HTTP code:
 
-image::limit-count-plugin-enable-access-failed-screenshot.png[]
+[source,text]
+----
+HTTP/1.1 503 Service Temporarily Unavailable
+Date: Sun, 08 May 2022 10:51:02 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 194
+Connection: keep-alive
+Server: APISIX/2.13.1
 
-You can configure the failure message with the `rejected_msg` attribute.
+<html>
+<head><title>503 Service Temporarily Unavailable</title></head>
+<body>
+<center><h1>503 Service Temporarily Unavailable</h1></center>
+<hr><center>openresty</center>
+</body>
+</html>
+----
+
+You can configure the failure HTTP Status `403 Forbidden` by configuring `rejected_code` and message with the `rejected_msg` attributes.
 For example, we can set it with `Requests are too frequent, please try again later`.
 After reaching the threshold, the response is akin to the following:
 
+.See the example with custom rejection message:
+[%collapsible]
+====
+[source,bash]
 ----
-HTTP/1.1 503 Service Temporarily Unavailable
-Content-Type: text/html
-Content-Length: 194
+curl -i http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    "uri": "/get",
+    "plugins": {
+        "limit-count": {
+            "count": 2,
+            "time_window": 60,
+            "rejected_code": 403,
+            "rejected_msg": "Requests are too frequent, please try again later.",
+            "key_type": "var",
+            "key": "remote_addr"
+        }
+    },
+    "upstream_id": "1"
+}'
+----
+====
+
+Result:
+
+[source,text]
+----
+HTTP/1.1 403 Forbidden
+Date: Sun, 08 May 2022 11:30:43 GMT
+Content-Type: text/plain; charset=utf-8
+Transfer-Encoding: chunked
 Connection: keep-alive
-Server: APISIX web server
+Server: APISIX/2.13.1
 
 {"error_msg":"Requests are too frequent, please try again later."}
 ----
