@@ -623,6 +623,11 @@ Output without token:
 
 We have validated the client's identity attempting to request by using various https://apisix.apache.org/docs/apisix/plugins/key-auth[authentication plugins] with the help of Apache APISIX.
 
+[TIP]
+====
+A https://youtu.be/kbELyQIXAsw[Centralized Authentication with Apache APISIX Plugins^] video tutorial describes different authentication methods, overviews the use-cases and benefits of centralized authentication with Apache APISIX API Gateway and you will learn how to configure common authentication plugins like basic, key, and JWT to protect your services.
+====
+
 === IP Restriction Plugin
 
 In our modern era, API security has become increasingly important.
@@ -643,6 +648,8 @@ An API Gateway can handle all those cross-cutting concerns.
 Another technique is to limit the IPs of clients that can send requests.
 The https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Apache APISIX IP Restrictions Plugin^] implements this technique.
 If the user tries to send a request from an IP that is not valid, Apache APISIX will meet them with an error.
+
+Single IPs, multiple IPs or ranges in https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation[CIDR^] notation like 10.10.10.0/24 can be used. The plugin supports IPv4 and IPv6 addresses.
 ====
 
 Let's enable `ip-restriction` plugin for our existing _Example route_.
@@ -656,8 +663,7 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
     "plugins": {
         "ip-restriction": {
             "whitelist": [
-                "127.0.0.1",
-                "113.74.26.106/24"
+                "127.0.0.1"
             ]
         }
     }
@@ -668,7 +674,7 @@ Output:
 
 image::ip-restrictions-enable-plugin-screenshot.png[]
 
-With IP restrictions that allow only specific IP addresses, requests from IP addresses outside of the list are rejected.
+With IP restrictions that allow only specific IP addresses, requests from IP addresses outside the list are rejected.
 
 [source,bash]
 ----
@@ -705,6 +711,16 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 Output:
 
 image::ip-restrictions-plugin-test-result-disabled-screenshot.png[]
+
+[INFO]
+====
+There are other security plugins are offered by Apache APISIX too.
+
+- **https://apisix.apache.org/docs/apisix/plugins/cors[CORS^]** – Enable https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[CORS^] easily to allow developers to make requests from the browser.
+- **https://apisix.apache.org/docs/apisix/plugins/uri-blocker[URI Blocker^]** (_uri-blocker_)–  Intercepts user requests and blocks uri resources.
+- **https://apisix.apache.org/docs/apisix/plugins/consumer-restriction[Consumer Restriction^]** (_consumer-restriction_) – makes corresponding access restrictions to your services or routes based on different users selected.
+- **https://apisix.apache.org/docs/apisix/plugins/csrf[CSRF^]** – Based on the Double Submit Cookie way, protects your API from CSRF attacks.
+====
 
 === Limit Count Plugin
 
@@ -1177,6 +1193,11 @@ image::zipkin-output-screenshot-2.png[]
 ====
 You can find information about other Apache APISIX Observability
 Plugins https://apisix.apache.org/docs/apisix/plugins/zipkin[here^].
+====
+
+[TIP]
+====
+A https://youtu.be/XK0xcui5BQU[APIs Observability with Apache APISIX Plugins^] video tutorial presents the power of some observability Plugins and takes a look at how to set up these plugins, how to use them to understand API behavior, and later solve problems that impact our users.
 ====
 
 === Serverless Plugin

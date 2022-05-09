@@ -1480,6 +1480,20 @@ Server: APISIX/2.12.1</code></pre>
 <div class="paragraph">
 <p>We have validated the client&#8217;s identity attempting to request by using various <a href="https://apisix.apache.org/docs/apisix/plugins/key-auth">authentication plugins</a> with the help of Apache APISIX.</p>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>A <a href="https://youtu.be/kbELyQIXAsw" target="_blank" rel="noopener">Centralized Authentication with Apache APISIX Plugins</a> video tutorial describes different authentication methods, overviews the use-cases and benefits of centralized authentication with Apache APISIX API Gateway and you will learn how to configure common authentication plugins like basic, key, and JWT to protect your services.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -1523,6 +1537,9 @@ Many hardening techniques are available:</p>
 The <a href="https://apisix.apache.org/docs/apisix/plugins/ip-restriction/" target="_blank" rel="noopener">Apache APISIX IP Restrictions Plugin</a> implements this technique.
 If the user tries to send a request from an IP that is not valid, Apache APISIX will meet them with an error.</p>
 </div>
+<div class="paragraph">
+<p>Single IPs, multiple IPs or ranges in <a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation" target="_blank" rel="noopener">CIDR</a> notation like 10.10.10.0/24 can be used. The plugin supports IPv4 and IPv6 addresses.</p>
+</div>
 </div>
 </div>
 <div class="paragraph">
@@ -1537,8 +1554,7 @@ If the user tries to send a request from an IP that is not valid, Apache APISIX 
     &quot;plugins&quot;: {
         &quot;ip-restriction&quot;: {
             &quot;whitelist&quot;: [
-                &quot;127.0.0.1&quot;,
-                &quot;113.74.26.106/24&quot;
+                &quot;127.0.0.1&quot;
             ]
         }
     }
@@ -1554,7 +1570,7 @@ If the user tries to send a request from an IP that is not valid, Apache APISIX 
 </div>
 </div>
 <div class="paragraph">
-<p>With IP restrictions that allow only specific IP addresses, requests from IP addresses outside of the list are rejected.</p>
+<p>With IP restrictions that allow only specific IP addresses, requests from IP addresses outside the list are rejected.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1610,6 +1626,29 @@ It&#8217;s possible to configure a more friendly message via the plugin.</p>
 <div class="imageblock">
 <div class="content">
 <img src="ip-restrictions-plugin-test-result-disabled-screenshot.png" alt="ip restrictions plugin test result disabled screenshot">
+</div>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>There are other security plugins are offered by Apache APISIX too.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/cors" target="_blank" rel="noopener">CORS</a></strong> – Enable <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank" rel="noopener">CORS</a> easily to allow developers to make requests from the browser.</p>
+</li>
+<li>
+<p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/uri-blocker" target="_blank" rel="noopener">URI Blocker</a></strong> (<em>uri-blocker</em>)–  Intercepts user requests and blocks uri resources.</p>
+</li>
+<li>
+<p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/consumer-restriction" target="_blank" rel="noopener">Consumer Restriction</a></strong> (<em>consumer-restriction</em>) – makes corresponding access restrictions to your services or routes based on different users selected.</p>
+</li>
+<li>
+<p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/csrf" target="_blank" rel="noopener">CSRF</a></strong> – Based on the Double Submit Cookie way, protects your API from CSRF attacks.</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -2197,6 +2236,20 @@ For example, by using docker you can simply run it:</p>
 Plugins <a href="https://apisix.apache.org/docs/apisix/plugins/zipkin" target="_blank" rel="noopener">here</a>.</p>
 </div>
 </div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>A <a href="https://youtu.be/XK0xcui5BQU" target="_blank" rel="noopener">APIs Observability with Apache APISIX Plugins</a> video tutorial presents the power of some observability Plugins and takes a look at how to set up these plugins, how to use them to understand API behavior, and later solve problems that impact our users.</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -2815,7 +2868,7 @@ Please navigate to <a href="https://apisix.apache.org/docs/apisix/internal/testi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-05-08 14:33:38 +0300
+Last updated 2022-05-09 23:18:25 +0300
 </div>
 </div>
 </body>
