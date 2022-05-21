@@ -775,6 +775,8 @@ Output:
 }
 ----
 
+Now we can try to request the same path with different consumer:
+
 [source,bash]
 ----
 curl -u jack2020:123456 http://127.0.0.1:9080/get
