@@ -474,7 +474,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_plugins_usage">Plugins Usage</a>
 <ul class="sectlevel2">
 <li><a href="#_jwt_plugin">JWT Plugin</a></li>
-<li><a href="#_ip_restriction_plugin">IP Restriction Plugin</a></li>
+<li><a href="#_consumer_restriction_plugin">Consumer Restriction Plugin</a></li>
 <li><a href="#_limit_count_plugin">Limit Count Plugin</a></li>
 <li><a href="#_http_logger_plugin">HTTP Logger Plugin</a></li>
 <li><a href="#_prometheus_plugin">Prometheus plugin</a></li>
@@ -1498,7 +1498,7 @@ Server: APISIX/2.12.1</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_ip_restriction_plugin">IP Restriction Plugin</h3>
+<h3 id="_consumer_restriction_plugin">Consumer Restriction Plugin</h3>
 <div class="paragraph">
 <p>In our modern era, API security has become increasingly important.
 Many hardening techniques are available:</p>
@@ -1526,6 +1526,9 @@ Many hardening techniques are available:</p>
 <li>
 <p>Logging</p>
 </li>
+<li>
+<p>IP restriction</p>
+</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -1534,29 +1537,47 @@ Many hardening techniques are available:</p>
 <div class="exampleblock">
 <div class="content">
 <div class="paragraph">
-<p>Another technique is to limit the IPs of clients that can send requests.
-The <a href="https://apisix.apache.org/docs/apisix/plugins/ip-restriction/" target="_blank" rel="noopener">Apache APISIX IP Restrictions Plugin</a> implements this technique.
-If the user tries to send a request from an IP that is not valid, Apache APISIX will meet them with an error.</p>
+<p>One of the techniques is to make corresponding access restrictions to API resources for specific users or services
+<a href="https://apisix.apache.org/docs/apisix/plugins/ip-restriction/" target="_blank" rel="noopener">Consumer Restriction</a> (<em>consumer-restriction</em>)
+– makes corresponding
+access restrictions to your services or routes based on different users selected.
+If unknown user tries to send a request, Apache APISIX will meet them with an error.</p>
+</div>
+</div>
 </div>
 <div class="paragraph">
-<p>Single IPs, multiple IPs or ranges in <a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation" target="_blank" rel="noopener">CIDR</a> notation like 10.10.10.0/24 can be used. The plugin supports IPv4 and IPv6 addresses.</p>
-</div>
-</div>
+<p>Assume that we have two consumers of our APIs (<code>jack2019</code> and <code>jack2020</code>). We want to give an access only to one of them.
+To do so, let&#8217;s create two consumers and enable <code>consumer-restriction</code> plugin for our existing <em>Example route</em>.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s enable <code>ip-restriction</code> plugin for our existing <em>Example route</em>.</p>
+<p>To create the first consumer, run the following command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -i -d '
 {
-    &quot;uri&quot;: &quot;/get&quot;,
-    &quot;upstream_id&quot;: &quot;1&quot;,
+    &quot;username&quot;: &quot;jack1&quot;,
     &quot;plugins&quot;: {
-        &quot;ip-restriction&quot;: {
-            &quot;whitelist&quot;: [
-                &quot;127.0.0.1&quot;
-            ]
+        &quot;basic-auth&quot;: {
+            &quot;username&quot;:&quot;jack2019&quot;,
+            &quot;password&quot;: &quot;123456&quot;
+        }
+    }
+}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To create the second consumer, run the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -i -d '
+{
+    &quot;username&quot;: &quot;jack2&quot;,
+    &quot;plugins&quot;: {
+        &quot;basic-auth&quot;: {
+            &quot;username&quot;:&quot;jack2020&quot;,
+            &quot;password&quot;: &quot;123456&quot;
         }
     }
 }'</code></pre>
@@ -1575,7 +1596,18 @@ If the user tries to send a request from an IP that is not valid, Apache APISIX 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/get -i --interface 127.0.0.2</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    &quot;uri&quot;: &quot;/get&quot;,
+    &quot;plugins&quot;: {
+        &quot;consumer-restriction&quot;: {
+            &quot;whitelist&quot;: [
+                &quot;jack1&quot;
+            ]
+        }
+    },
+    &quot;upstream_id&quot;: &quot;1&quot;
+}'</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1597,8 +1629,8 @@ If the user tries to send a request from an IP that is not valid, Apache APISIX 
 </td>
 <td class="content">
 <div class="paragraph">
-<p>By default, the plugin returns a generic <code>{"message":"Your IP address is not allowed"}</code> if the IP is not allowed.
-It&#8217;s possible to configure a more friendly message via the plugin.</p>
+<p>By default, the plugin returns a generic <code>{"message":"The consumer_name is forbidden."}</code> if the object is not allowed.
+It&#8217;s possible to configure a more friendly message via the plugin attribute.</p>
 </div>
 </td>
 </tr>
@@ -1621,14 +1653,6 @@ It&#8217;s possible to configure a more friendly message via the plugin.</p>
 }'</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Output:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="ip-restrictions-plugin-test-result-disabled-screenshot.png" alt="ip restrictions plugin test result disabled screenshot">
-</div>
-</div>
 <div class="exampleblock">
 <div class="content">
 <div class="paragraph">
@@ -1643,7 +1667,7 @@ It&#8217;s possible to configure a more friendly message via the plugin.</p>
 <p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/uri-blocker" target="_blank" rel="noopener">URI Blocker</a></strong> (<em>uri-blocker</em>)–  Intercepts user requests and blocks uri resources.</p>
 </li>
 <li>
-<p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/consumer-restriction" target="_blank" rel="noopener">Consumer Restriction</a></strong> (<em>consumer-restriction</em>) – makes corresponding access restrictions to your services or routes based on different users selected.</p>
+<p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/ip-restriction/" target="_blank" rel="noopener">IP Restriction</a></strong> (<em>consumer-restriction</em>) – technique is to limit the IPs of clients that can send requests.</p>
 </li>
 <li>
 <p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/csrf" target="_blank" rel="noopener">CSRF</a></strong> – Based on the Double Submit Cookie way, protects your API from CSRF attacks.</p>
@@ -2869,7 +2893,7 @@ Please navigate to <a href="https://apisix.apache.org/docs/apisix/internal/testi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-05-21 16:39:50 +0300
+Last updated 2022-05-21 17:41:20 +0300
 </div>
 </div>
 </body>

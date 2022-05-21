@@ -628,7 +628,7 @@ We have validated the client's identity attempting to request by using various h
 A https://youtu.be/kbELyQIXAsw[Centralized Authentication with Apache APISIX Plugins^] video tutorial describes different authentication methods, overviews the use-cases and benefits of centralized authentication with Apache APISIX API Gateway and you will learn how to configure common authentication plugins like basic, key, and JWT to protect your services.
 ====
 
-=== IP Restriction Plugin
+=== Consumer Restriction Plugin
 
 In our modern era, API security has become increasingly important.
 Many hardening techniques are available:
@@ -640,31 +640,50 @@ Many hardening techniques are available:
 * Continuously monitoring
 * Auditing
 * Logging
+* IP restriction
 
 An API Gateway can handle all those cross-cutting concerns.
 
 [INFO]
 ====
-Another technique is to limit the IPs of clients that can send requests.
-The https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Apache APISIX IP Restrictions Plugin^] implements this technique.
-If the user tries to send a request from an IP that is not valid, Apache APISIX will meet them with an error.
+One of the techniques is to make corresponding access restrictions to API resources for specific users or services
+https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Consumer Restriction^] (_consumer-restriction_)
+– makes corresponding
+access restrictions to your services or routes based on different users selected.
+If unknown user tries to send a request, Apache APISIX will meet them with an error.
 
-Single IPs, multiple IPs or ranges in https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation[CIDR^] notation like 10.10.10.0/24 can be used. The plugin supports IPv4 and IPv6 addresses.
 ====
 
-Let's enable `ip-restriction` plugin for our existing _Example route_.
+Assume that we have two consumers of our APIs (`jack2019` and `jack2020`). We want to give an access only to one of them.
+To do so, let's create two consumers and enable `consumer-restriction` plugin for our existing _Example route_.
+
+To create the first consumer, run the following command:
 
 [source,bash]
 ----
-curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -i -d '
 {
-    "uri": "/get",
-    "upstream_id": "1",
+    "username": "jack1",
     "plugins": {
-        "ip-restriction": {
-            "whitelist": [
-                "127.0.0.1"
-            ]
+        "basic-auth": {
+            "username":"jack2019",
+            "password": "123456"
+        }
+    }
+}'
+----
+
+To create the second consumer, run the following command:
+
+[source,bash]
+----
+curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -i -d '
+{
+    "username": "jack2",
+    "plugins": {
+        "basic-auth": {
+            "username":"jack2020",
+            "password": "123456"
         }
     }
 }'
@@ -678,7 +697,18 @@ With IP restrictions that allow only specific IP addresses, requests from IP add
 
 [source,bash]
 ----
-curl http://127.0.0.1:9080/get -i --interface 127.0.0.2
+curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT -d '
+{
+    "uri": "/get",
+    "plugins": {
+        "consumer-restriction": {
+            "whitelist": [
+                "jack1"
+            ]
+        }
+    },
+    "upstream_id": "1"
+}'
 ----
 
 Output:
@@ -689,8 +719,8 @@ We can not access the API with IPs other than the allowed ones.
 
 [TIP]
 ====
-By default, the plugin returns a generic `{"message":"Your IP address is not allowed"}` if the IP is not allowed.
-It's possible to configure a more friendly message via the plugin.
+By default, the plugin returns a generic `{"message":"The consumer_name is forbidden."}` if the object is not allowed.
+It's possible to configure a more friendly message via the plugin attribute.
 ====
 
 In addition, the plugin also provides the ability to disallow IP address ranges.
@@ -708,17 +738,13 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 }'
 ----
 
-Output:
-
-image::ip-restrictions-plugin-test-result-disabled-screenshot.png[]
-
 [INFO]
 ====
 There are other security plugins are offered by Apache APISIX too.
 
 - **https://apisix.apache.org/docs/apisix/plugins/cors[CORS^]** – Enable https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[CORS^] easily to allow developers to make requests from the browser.
 - **https://apisix.apache.org/docs/apisix/plugins/uri-blocker[URI Blocker^]** (_uri-blocker_)–  Intercepts user requests and blocks uri resources.
-- **https://apisix.apache.org/docs/apisix/plugins/consumer-restriction[Consumer Restriction^]** (_consumer-restriction_) – makes corresponding access restrictions to your services or routes based on different users selected.
+- **https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[IP Restriction^]** (_consumer-restriction_) – technique is to limit the IPs of clients that can send requests.
 - **https://apisix.apache.org/docs/apisix/plugins/csrf[CSRF^]** – Based on the Double Submit Cookie way, protects your API from CSRF attacks.
 ====
 
