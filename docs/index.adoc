@@ -152,7 +152,7 @@ health check, retries, retry timeout or load-balancing to multiple systems.
 [INFO]
 ====
 You can learn more about other Admin API Upstream request methods
-https://apisix.apache.org/docs/apisix/plugins/zipkin[here^].
+https://apisix.apache.org/docs/apisix/admin-api#:~:text=Back%20to%20TOC-,Upstream,-%23[here^].
 ====
 
 == Bind the Route to the Upstream
@@ -398,7 +398,7 @@ Server: APISIX/2.12.1
 }
 ----
 
-This section shows how to use Apache APISIX to deploy, configure, and securely publish APIs from the Dashboard.
+Above section showed how to use Apache APISIX to deploy, configure, and securely publish APIs from the Dashboard.
 
 == Plugins Usage
 
