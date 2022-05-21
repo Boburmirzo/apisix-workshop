@@ -43,7 +43,6 @@ etcd:
   timeout: 30                     # 30 seconds
 
 plugins:
-  - public-api
   - http-logger
   - ip-restriction
   - jwt-auth
@@ -58,6 +57,7 @@ plugins:
   - zipkin
   - traffic-split
   - azure-functions
+  - public-api
 plugin_attr:
   prometheus:
     export_addr:

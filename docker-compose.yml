@@ -29,7 +29,7 @@ services:
       apisix:
 
   apisix:
-    image: apache/apisix:2.12.1-alpine
+    image: apache/apisix:2.13.1-alpine
     restart: always
     volumes:
       - ./apisix_log:/usr/local/apisix/logs
@@ -113,4 +113,3 @@ networks:
 volumes:
   etcd_data:
     driver: local
-
