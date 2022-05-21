@@ -58,6 +58,7 @@ plugins:
   - traffic-split
   - azure-functions
   - public-api
+  - consumer-restriction
 plugin_attr:
   prometheus:
     export_addr:
