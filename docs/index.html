@@ -1537,7 +1537,7 @@ Many hardening techniques are available:</p>
 <div class="exampleblock">
 <div class="content">
 <div class="paragraph">
-<p>One of the techniques is to make corresponding access restrictions to API resources for specific users or services
+<p>One of the techniques is to make corresponding access restrictions to API resources for specific users or services.
 <a href="https://apisix.apache.org/docs/apisix/plugins/ip-restriction/" target="_blank" rel="noopener">Consumer Restriction</a> (<em>consumer-restriction</em>)
 – makes corresponding
 access restrictions to your services or routes based on different users selected.
@@ -1584,15 +1584,7 @@ To do so, let&#8217;s create two consumers and enable <code>consumer-restriction
 </div>
 </div>
 <div class="paragraph">
-<p>Output:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="ip-restrictions-enable-plugin-screenshot.png" alt="ip restrictions enable plugin screenshot">
-</div>
-</div>
-<div class="paragraph">
-<p>With IP restrictions that allow only specific IP addresses, requests from IP addresses outside the list are rejected.</p>
+<p>Then, enable <code>consumer-restriction</code> plugin:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1600,6 +1592,7 @@ To do so, let&#8217;s create two consumers and enable <code>consumer-restriction
 {
     &quot;uri&quot;: &quot;/get&quot;,
     &quot;plugins&quot;: {
+        &quot;basic-auth&quot;: {},
         &quot;consumer-restriction&quot;: {
             &quot;whitelist&quot;: [
                 &quot;jack1&quot;
@@ -1613,13 +1606,33 @@ To do so, let&#8217;s create two consumers and enable <code>consumer-restriction
 <div class="paragraph">
 <p>Output:</p>
 </div>
-<div class="imageblock">
+<div class="listingblock">
 <div class="content">
-<img src="ip-restrictions-plugin-test-result-screenshot.png" alt="ip restrictions plugin test result screenshot">
+<pre class="CodeRay highlight"><code data-lang="json">{
+  <span style="color:#606"><span style="color:#404">&quot;</span><span>node</span><span style="color:#404">&quot;</span></span>: {
+    <span style="color:#606"><span style="color:#404">&quot;</span><span>key</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\/</span><span style="color:#D20">apisix</span><span style="color:#b0b">\/</span><span style="color:#D20">routes</span><span style="color:#b0b">\/</span><span style="color:#D20">1</span><span style="color:#710">&quot;</span></span>,
+    <span style="color:#606"><span style="color:#404">&quot;</span><span>value</span><span style="color:#404">&quot;</span></span>: {
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>status</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1</span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>update_time</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1653144236</span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>create_time</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">1653138186</span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>priority</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">0</span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>plugins</span><span style="color:#404">&quot;</span></span>: {
+        <span style="color:#606"><span style="color:#404">&quot;</span><span>consumer-restriction</span><span style="color:#404">&quot;</span></span>: {
+          <span style="color:#606"><span style="color:#404">&quot;</span><span>whitelist</span><span style="color:#404">&quot;</span></span>: [
+            <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">jack1</span><span style="color:#710">&quot;</span></span>
+          ],
+          <span style="color:#606"><span style="color:#404">&quot;</span><span>rejected_code</span><span style="color:#404">&quot;</span></span>: <span style="color:#00D">403</span>,
+          <span style="color:#606"><span style="color:#404">&quot;</span><span>type</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">consumer_name</span><span style="color:#710">&quot;</span></span>
+        }
+      },
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>uri</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\/</span><span style="color:#D20">get</span><span style="color:#710">&quot;</span></span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>id</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">1</span><span style="color:#710">&quot;</span></span>,
+      <span style="color:#606"><span style="color:#404">&quot;</span><span>upstream_id</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">1</span><span style="color:#710">&quot;</span></span>
+    }
+  },
+  <span style="color:#606"><span style="color:#404">&quot;</span><span>action</span><span style="color:#404">&quot;</span></span>: <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">set</span><span style="color:#710">&quot;</span></span>
+}</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>We can not access the API with IPs other than the allowed ones.</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -1629,6 +1642,10 @@ To do so, let&#8217;s create two consumers and enable <code>consumer-restriction
 </td>
 <td class="content">
 <div class="paragraph">
+<p>The <code>consumer-restriction</code> has the <em>type</em> property which is enumerated type (it support the following values:
+<em>consumer_name</em>, <em>service_id</em> and <em>route_id</em>), we can specify it to allow access to correspond object.</p>
+</div>
+<div class="paragraph">
 <p>By default, the plugin returns a generic <code>{"message":"The consumer_name is forbidden."}</code> if the object is not allowed.
 It&#8217;s possible to configure a more friendly message via the plugin attribute.</p>
 </div>
@@ -1637,10 +1654,51 @@ It&#8217;s possible to configure a more friendly message via the plugin attribut
 </table>
 </div>
 <div class="paragraph">
-<p>In addition, the plugin also provides the ability to disallow IP address ranges.</p>
+<p>Now we can test if the consumer <em>jack1</em> can request the API resource with the provided credentials.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -u jack2019:123456 http://127.0.0.1:9080/get</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>When wanting to disable a plugin, we can delete the corresponding JSON configuration from the plugin configuration.
+<p>Output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json5">{
+  &quot;args&quot;: {},
+  &quot;headers&quot;: {
+    &quot;Accept&quot;: &quot;*/*&quot;,
+    &quot;Authorization&quot;: &quot;Basic amFjazIwMTk6MTIzNDU2&quot;,
+    &quot;Host&quot;: &quot;127.0.0.1&quot;,
+    &quot;User-Agent&quot;: &quot;curl/7.79.1&quot;,
+    &quot;X-Amzn-Trace-Id&quot;: &quot;Root=1-6288fe68-0b820d5c62c90f860e7266da&quot;,
+    &quot;X-Forwarded-Host&quot;: &quot;127.0.0.1&quot;
+  },
+  &quot;origin&quot;: &quot;172.20.0.1, 85.253.33.40&quot;,
+  &quot;url&quot;: &quot;http://127.0.0.1/get&quot;
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">curl -u jack2020:123456 http://127.0.0.1:9080/get</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>However, our the second consumer has no access.</p>
+</div>
+<div class="paragraph">
+<p>Output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="json">{<span style="color:#606"><span style="color:#404">&quot;</span><span>message</span><span style="color:#404">&quot;</span></span>:<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">The consumer_name is forbidden.</span><span style="color:#710">&quot;</span></span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It is also possible to disable a plugin, we can delete the corresponding JSON configuration from the plugin configuration.
 <strong>Apache APISIX supports hot reloading</strong>; there&#8217;s no need to restart the service!</p>
 </div>
 <div class="listingblock">
@@ -1667,7 +1725,8 @@ It&#8217;s possible to configure a more friendly message via the plugin attribut
 <p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/uri-blocker" target="_blank" rel="noopener">URI Blocker</a></strong> (<em>uri-blocker</em>)–  Intercepts user requests and blocks uri resources.</p>
 </li>
 <li>
-<p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/ip-restriction/" target="_blank" rel="noopener">IP Restriction</a></strong> (<em>consumer-restriction</em>) – technique is to limit the IPs of clients that can send requests.</p>
+<p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/ip-restriction/" target="_blank" rel="noopener">IP Restriction</a></strong> (<em>consumer-restriction</em>) – technique is to limit the IPs of clients that can send requests
+by whitelisting/blacklisting IP addresses list.</p>
 </li>
 <li>
 <p><strong><a href="https://apisix.apache.org/docs/apisix/plugins/csrf" target="_blank" rel="noopener">CSRF</a></strong> – Based on the Double Submit Cookie way, protects your API from CSRF attacks.</p>
@@ -2893,7 +2952,7 @@ Please navigate to <a href="https://apisix.apache.org/docs/apisix/internal/testi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-05-21 17:41:20 +0300
+Last updated 2022-05-21 18:03:58 +0300
 </div>
 </div>
 </body>

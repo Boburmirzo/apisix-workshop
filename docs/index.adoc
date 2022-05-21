@@ -646,7 +646,7 @@ An API Gateway can handle all those cross-cutting concerns.
 
 [INFO]
 ====
-One of the techniques is to make corresponding access restrictions to API resources for specific users or services
+One of the techniques is to make corresponding access restrictions to API resources for specific users or services.
 https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[Consumer Restriction^] (_consumer-restriction_)
 – makes corresponding
 access restrictions to your services or routes based on different users selected.
@@ -689,11 +689,7 @@ curl http://127.0.0.1:9080/apisix/admin/consumers -H 'X-API-KEY: edd1c9f034335f1
 }'
 ----
 
-Output:
-
-image::ip-restrictions-enable-plugin-screenshot.png[]
-
-With IP restrictions that allow only specific IP addresses, requests from IP addresses outside the list are rejected.
+Then, enable `consumer-restriction` plugin:
 
 [source,bash]
 ----
@@ -701,6 +697,7 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 {
     "uri": "/get",
     "plugins": {
+        "basic-auth": {},
         "consumer-restriction": {
             "whitelist": [
                 "jack1"
@@ -713,19 +710,86 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 
 Output:
 
-image::ip-restrictions-plugin-test-result-screenshot.png[]
-
-We can not access the API with IPs other than the allowed ones.
+[source,json]
+----
+{
+  "node": {
+    "key": "\/apisix\/routes\/1",
+    "value": {
+      "status": 1,
+      "update_time": 1653144236,
+      "create_time": 1653138186,
+      "priority": 0,
+      "plugins": {
+        "consumer-restriction": {
+          "whitelist": [
+            "jack1"
+          ],
+          "rejected_code": 403,
+          "type": "consumer_name"
+        }
+      },
+      "uri": "\/get",
+      "id": "1",
+      "upstream_id": "1"
+    }
+  },
+  "action": "set"
+}
+----
 
 [TIP]
 ====
+
+The `consumer-restriction` has the _type_ property which is enumerated type (it support the following values:
+_consumer_name_, _service_id_ and _route_id_), we can specify it to allow access to correspond object.
+
+
 By default, the plugin returns a generic `{"message":"The consumer_name is forbidden."}` if the object is not allowed.
 It's possible to configure a more friendly message via the plugin attribute.
 ====
 
-In addition, the plugin also provides the ability to disallow IP address ranges.
+Now we can test if the consumer _jack1_ can request the API resource with the provided credentials.
 
-When wanting to disable a plugin, we can delete the corresponding JSON configuration from the plugin configuration.
+[source,bash]
+----
+curl -u jack2019:123456 http://127.0.0.1:9080/get
+----
+
+Output:
+
+[source,json5]
+----
+{
+  "args": {},
+  "headers": {
+    "Accept": "*/*",
+    "Authorization": "Basic amFjazIwMTk6MTIzNDU2",
+    "Host": "127.0.0.1",
+    "User-Agent": "curl/7.79.1",
+    "X-Amzn-Trace-Id": "Root=1-6288fe68-0b820d5c62c90f860e7266da",
+    "X-Forwarded-Host": "127.0.0.1"
+  },
+  "origin": "172.20.0.1, 85.253.33.40",
+  "url": "http://127.0.0.1/get"
+}
+----
+
+[source,bash]
+----
+curl -u jack2020:123456 http://127.0.0.1:9080/get
+----
+
+However, our the second consumer has no access.
+
+Output:
+
+[source,json]
+----
+{"message":"The consumer_name is forbidden."}
+----
+
+It is also possible to disable a plugin, we can delete the corresponding JSON configuration from the plugin configuration.
 *Apache APISIX supports hot reloading*; there's no need to restart the service!
 
 [source,bash]
@@ -744,7 +808,8 @@ There are other security plugins are offered by Apache APISIX too.
 
 - **https://apisix.apache.org/docs/apisix/plugins/cors[CORS^]** – Enable https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[CORS^] easily to allow developers to make requests from the browser.
 - **https://apisix.apache.org/docs/apisix/plugins/uri-blocker[URI Blocker^]** (_uri-blocker_)–  Intercepts user requests and blocks uri resources.
-- **https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[IP Restriction^]** (_consumer-restriction_) – technique is to limit the IPs of clients that can send requests.
+- **https://apisix.apache.org/docs/apisix/plugins/ip-restriction/[IP Restriction^]** (_consumer-restriction_) – technique is to limit the IPs of clients that can send requests
+by whitelisting/blacklisting IP addresses list.
 - **https://apisix.apache.org/docs/apisix/plugins/csrf[CSRF^]** – Based on the Double Submit Cookie way, protects your API from CSRF attacks.
 ====
 
