@@ -806,7 +806,7 @@ Server: APISIX/2.13.1
 
 You can configure the failure HTTP Status `403 Forbidden` by configuring `rejected_code` and message with the `rejected_msg` attributes.
 For example, we can set it with `Requests are too frequent, please try again later`.
-After reaching the threshold, the response is akin to the following:
+After reaching the threshold, the response is similar to the following:
 
 .See the example with custom rejection message:
 [%collapsible]

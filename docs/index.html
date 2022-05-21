@@ -1409,7 +1409,7 @@ Please check the <a href="https://apisix.apache.org/docs/apisix/plugins/jwt-auth
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">curl http://127.0.0.1:9080/apisix/plugin/jwt/sign?key=user-key -i</code></pre>
+<pre class="CodeRay highlight"><code data-lang="bash">curl 'http://127.0.0.1:9080/apisix/plugin/jwt/sign?key=user-key'</code></pre>
 </div>
 </div>
 </div>
@@ -1746,7 +1746,7 @@ Server: APISIX/2.13.1
 <div class="paragraph">
 <p>You can configure the failure HTTP Status <code>403 Forbidden</code> by configuring <code>rejected_code</code> and message with the <code>rejected_msg</code> attributes.
 For example, we can set it with <code>Requests are too frequent, please try again later</code>.
-After reaching the threshold, the response is akin to the following:</p>
+After reaching the threshold, the response is similar to the following:</p>
 </div>
 <details>
 <summary class="title">See the example with custom rejection message:</summary>
@@ -2869,7 +2869,7 @@ Please navigate to <a href="https://apisix.apache.org/docs/apisix/internal/testi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-05-21 15:14:52 +0300
+Last updated 2022-05-21 16:39:50 +0300
 </div>
 </div>
 </body>
