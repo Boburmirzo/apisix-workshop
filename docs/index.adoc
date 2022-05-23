@@ -1487,7 +1487,7 @@ plugins:
   - limit-conn
   - limit-count
   .....
-  - files-logger // To enable our custom plugin, we add the plugin name to the end of list.
+  - file-logger // To enable our custom plugin, we add the plugin name to the end of list.
 
 ----
 
@@ -1633,6 +1633,15 @@ It can be seen that the path: `logs/file.log` we configured for the plugin as th
 [TIP]
 ====
 We can directly run `apisix reload` command to reload the latest plugin code without restarting Apache APISIX.
+====
+
+.See the command to reload the new added plugin:
+[%collapsible]
+====
+[source,curl]
+----
+curl http://127.0.0.1:9080/apisix/admin/plugins/reload -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT
+----
 ====
 
 You can also try to write core functionality for the custom `file-logger` plugin,
