@@ -2635,7 +2635,7 @@ under <code>apisix:</code> section in the config file:</p>
   - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">limit-conn</span></span>
   - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">limit-count</span></span>
   <span style="color:#F00;background-color:#FAA">.....</span>
-  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">files-logger // To enable our custom plugin, we add the plugin name to the end of list.</span></span></code></pre>
+  - <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#D20">file-logger // To enable our custom plugin, we add the plugin name to the end of list.</span></span></code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -2855,6 +2855,16 @@ conf: {&quot;path&quot;:&quot;logs\/file.log&quot;} while logging request
 </tr>
 </table>
 </div>
+<details>
+<summary class="title">See the command to reload the new added plugin:</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="curl">curl http://127.0.0.1:9080/apisix/admin/plugins/reload -H 'X-API-KEY: edd1c9f034335f136f87ad84b625c8f1' -X PUT</code></pre>
+</div>
+</div>
+</div>
+</details>
 <div class="paragraph">
 <p>You can also try to write core functionality for the custom <code>file-logger</code> plugin,
 where the program can get the log output path from conf param, create/update the file with new logs.
@@ -2954,7 +2964,7 @@ Please navigate to <a href="https://apisix.apache.org/docs/apisix/internal/testi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-05-21 20:33:51 +0300
+Last updated 2022-05-23 14:51:44 +0300
 </div>
 </div>
 </body>
